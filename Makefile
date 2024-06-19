@@ -4,7 +4,7 @@ HEADERS	= -I ./include
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 DEBUG_CFLAGS = -fsanitize=address -g3
-SRCS = main.c
+SRCS = src/main.c	src/ft_atoi.c
 OBJS = $(SRCS:.c=.o)
 RM = rm -f
 
