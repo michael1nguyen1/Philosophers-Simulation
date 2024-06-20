@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/06/20 23:20:55 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/06/20 23:29:59 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,7 @@ int	simulation(t_philo *data)
 	}
 	return (0);
 }
-
+//test these things
 int main(int argc, char** argv)
 {
 	t_philo data;
