@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/06/19 22:24:20 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/06/20 23:20:55 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,49 @@ int	check_args(int argc, char **argv)
 	return (0);
 }
 
+void	free_mallocs(t_philo *data)
+{
+	if (data->last_ate)
+		free (data->last_ate);
+	if (data->meals_ate)
+		free (data->meals_ate);
+	if (data->forks)
+		free (data->forks);
+}
+
+int	destroy_mutex(t_philo *data, int amount)
+{
+	int	i;
+
+	i = 0;
+	while (i < amount)
+	{
+		if (pthread_mutex_destroy(&data->forks[i]) != 0)
+			return (put_error_fd(2, "mutex destroy failed\n"));
+		i++;
+	}
+	return (0);
+}
+
+int init_mutex(t_philo *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < data->philo)
+	{	
+		if (pthread_mutex_init(&data->forks[i], NULL) != 0)
+			return (put_error_fd(2, "mutex init failed"));
+		i++;
+	}
+	if (pthread_mutex_init(&data->print, NULL) != 0)
+	{
+		destroy_mutex(data, data->philo);
+		return (put_error_fd(2, "mutex init failed"));
+	}
+	return (0);
+}
+
 int	init_struct(int argc, char** argv, t_philo *data)
 {
 	data->philo = ft_atoi(argv[1]);
@@ -49,29 +92,30 @@ int	init_struct(int argc, char** argv, t_philo *data)
 	data->eat_time = ft_atoi(argv[3]);
 	data->sleep_time = ft_atoi(argv[4]);
 	if (argc == 6)
-		data->eat_count = ft_atoi(argv[5]);
+		data->max_meals = ft_atoi(argv[5]);
 	else
-		data->eat_count = 0;
+		data->max_meals = 0;
+	data->philo_num = 0;
 	data->dead_flag = 1;
-	if (pthread_mutex_init(&data->mutex, NULL) != 0)
-		return (put_error_fd(2, "mutex init failed"));
-	data->philo_count = 0;
-	data->meals_ate = 0;
+	data->meals_ate = malloc(sizeof(int) * data->philo);
 	data->last_ate = malloc(sizeof(int) * data->philo);
-	if (!data->last_ate)
-		return(put_error_fd(2, "malloc failed in init_struct\n"));
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->philo);
-	if (!data->last_ate)
+	if (!data->last_ate || !data->meals_ate || !data->forks)
+	{
+		free_mallocs(data);
 		return(put_error_fd(2, "malloc failed in init_struct\n"));
+	}
+	if (init_mutex(data) == -1)
+		return (-1);
 	return (0);	
 }
 
-double	get_time()
+int	get_time()
 {
 	struct timeval	time;
-	long 			seconds;
-	long			useconds;
-	double			total;
+	int 			seconds;
+	int			useconds;
+	int				total;
 
 	gettimeofday(&time, NULL);
 	seconds = time.tv_sec;
@@ -80,27 +124,36 @@ double	get_time()
 	return (total);
 }
 
-void sleep(t_philo *data)
+int	eat(t_philo *data)
 {
-	
+	int	time;
+
+	time = get_time();
+	if (time - data->last_ate[*data->philo_num] > data->die_time)
+	{
+		printf("Philo %d has died\n", *data->philo_num + 1);
+		data->dead_flag = 0;
+		return (1);
+	}
+	printf("Philo num is %d is\n", *data->philo_num);
+	printf("Philo %d is eating\n", *data->philo_num + 1);
+	usleep(data->eat_time);
+	return (0);
 }
 
 void *philo_life(void *arg)
 {
 	t_philo *data;
-	int		i;
-	
-	i = 0;
+
+	printf("philo life\n");
 	data = (t_philo*)arg;
-	while (data->dead_flag || data->meals_ate != data->eat_count)
+	while (data->dead_flag)
 	{
-		if (i == data->philo - 1)
-			i = 0;
-		data->last_ate[i] = get_time();
-		if (data->philo_count == data->philo)
-			data->meals_ate++;
-		i++;
+		data->last_ate[*data->philo_num] = get_time();
+		eat(data);
+		// break;
 	}
+	free(data->philo_num);
 	return NULL;
 }
 
@@ -112,13 +165,13 @@ int	simulation(t_philo *data)
 	i = 0;
 	while (i < data->philo)
 	{
-		data->philo_count = malloc(sizeof(int));
-		if (!data->philo_count)
+		data->philo_num = malloc(sizeof(int));
+		if (!data->philo_num)
 			return(put_error_fd(2, "malloc in simulation failed\n"));
-		data->philo_count = i + 1;
-		if (pthread_create(&thread[i++], NULL, &philo_life, data) != 0)
+		*data->philo_num = i;
+		printf("philo num in sim%d\n", *data->philo_num);
+		if (pthread_create(&thread[i], NULL, &philo_life, data) != 0)
 			return(put_error_fd(2, "thread failed\n"));
-		free(data->philo_count);
 		i++;
 	}
 	i = 0;
@@ -142,8 +195,7 @@ int main(int argc, char** argv)
 			return (-1);
 		if (simulation(&data) == -1)
 			return (-1);
-		if (pthread_mutex_destroy(&data.mutex) != 0)
-			return (put_error_fd(2, "mutex destroy failed\n"));
+		return (destroy_mutex(&data, data.philo));
 	}
     else
 		return (put_error_fd(2, "Wrong number of ARGS!\n"));

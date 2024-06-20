@@ -14,13 +14,13 @@ typedef struct s_philo
     int				die_time;
     int				eat_time;
     int				sleep_time;
-    int				eat_count;
-    int 			meals_ate;
+    int				max_meals;
+    int 			*philo_num;
     int 			dead_flag;
+    int 			*meals_ate;
     int				*last_ate;
-    int 			philo_count;
     pthread_mutex_t *forks;
-	pthread_mutex_t *print;
+	pthread_mutex_t print;
 } t_philo;
 
 int     ft_atoi(const char *str);
