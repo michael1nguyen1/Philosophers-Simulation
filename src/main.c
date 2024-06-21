@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/06/21 18:36:13 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/06/21 21:04:58 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,80 +42,17 @@ int	check_args(int argc, char **argv)
 	return (0);
 }
 
-void	free_mallocs(t_philo *data)
-{
-	if (data->last_ate)
-		free (data->last_ate);
-	if (data->meals_ate)
-		free (data->meals_ate);
-	if (data->forks)
-		free (data->forks);
-}
-
-int	destroy_mutex(t_philo *data, int amount)
+int	destroy_mutex_array(pthread_mutex_t *forks, int amount)
 {
 	int	i;
 
 	i = 0;
 	while (i < amount)
 	{
-		pthread_mutex_destroy(&data->forks[i]);
+		pthread_mutex_destroy(&forks[i]);
 		i++;
 	}
 	return (0);
-}
-
-int init_mutex(t_philo *data)
-{
-	int	i;
-
-	i = 0;
-	while (i < data->philo)
-	{	
-		if (pthread_mutex_init(&data->forks[i], NULL) != 0)
-		{
-			destroy_mutex(data, i + 1);
-			return (put_error_fd(2, "mutex init failed"));
-		}
-		i++;
-	}
-	if (pthread_mutex_init(&data->print, NULL) != 0)
-	{
-		destroy_mutex(data, data->philo);
-		return (put_error_fd(2, "mutex init failed"));
-	}
-	if (pthread_mutex_init(&data->dead, NULL) != 0)
-	{
-		pthread_mutex_destroy(&data->print);
-		destroy_mutex(data, data->philo);
-		return (put_error_fd(2, "mutex init failed"));
-	}
-	return (0);
-}
-
-int	init_struct(int argc, char** argv, t_philo *data)
-{
-	data->philo = ft_atoi(argv[1]);
-	data->die_time = ft_atoi(argv[2]);
-	data->eat_time = ft_atoi(argv[3]);
-	data->sleep_time = ft_atoi(argv[4]);
-	if (argc == 6)
-		data->max_meals = ft_atoi(argv[5]);
-	else
-		data->max_meals = 0;
-	data->philo_num = 0;
-	data->alive = 1;
-	data->meals_ate = malloc(sizeof(int) * data->philo);
-	data->last_ate = malloc(sizeof(int) * data->philo);
-	data->forks = malloc(sizeof(pthread_mutex_t) * data->philo);
-	if (!data->last_ate || !data->meals_ate || !data->forks)
-	{
-		free_mallocs(data);
-		return(put_error_fd(2, "malloc failed in init_struct\n"));
-	}
-	if (init_mutex(data) == -1)
-		return (-1);
-	return (0);	
 }
 
 int	get_time()
@@ -137,13 +74,7 @@ int	eat(t_philo *data)
 	int	time;
 
 	time = get_time();
-	if (time - data->last_ate[*data->philo_num] > data->die_time)
-	{
-		printf("Philo %d has died\n", *data->philo_num + 1);
-		data->alive = 0;
-		return (1);
-	}
-	printf("Philo %d is eating\n", *data->philo_num + 1);
+	
 	usleep(data->eat_time);
 	return (0);
 }
@@ -153,42 +84,28 @@ void *philo_life(void *arg)
 	t_philo *data;
 
 	data = (t_philo*)arg;
-	printf("philo %p has entered life\n", data->philo_num);
-	data->last_ate[*data->philo_num] = get_time();
 	while (data->alive)
 	{
-		pthread_mutex_lock(&data->dead);
-		if (!data->alive)
-		{
-			pthread_mutex_unlock(&data->dead);
-			break;
-		}
-		pthread_mutex_unlock(&data->dead);
 		eat(data);
 		break;
 	}
-	free(data->philo_num);
 	return NULL;
 }
 
 int	simulation(t_philo *data)
 {
-	pthread_t thread[data->philo];
+	pthread_t thread[data[0].philo];
 	int i;
 	
 	i = 0;
-	while (i < data->philo)
+	while (i < data[0].philo)
 	{
-		data->philo_num = malloc(sizeof(int));
-		if (!data->philo_num)
-			return(put_error_fd(2, "malloc in simulation failed\n"));
-		*data->philo_num = i;
 		if (pthread_create(&thread[i], NULL, &philo_life, data) != 0)
 			return(put_error_fd(2, "thread failed\n"));
 		i++;
 	}
 	i = 0;
-	while (i < data->philo)
+	while (i < data[0].philo)
 	{
 		if(pthread_join(thread[i++],NULL) != 0)
 			return(put_error_fd(2, "joined failed\n"));
@@ -196,19 +113,116 @@ int	simulation(t_philo *data)
 	return (0);
 }
 
+void	assign_forks(t_philo *data, pthread_mutex_t *forks)
+{
+	int i;
+
+	i = 0;
+	while (i < data->philo)
+	{
+		data[i].left_fork = &forks[i];
+		if (i == data->philo - 1)
+			data[i].right_fork = &forks[0];
+		else
+			data[i].right_fork = &forks[i + 1];
+	}
+}
+
+int create_rest_of_mutex(pthread_mutex_t print, pthread_mutex_t dead, t_philo *data)
+{
+	int i;
+	
+	i = 0;
+	if (pthread_mutex_init(&print, NULL) != 0)
+	{
+		return (put_error_fd(2, "mutex init failed\n"));
+	}
+	if (pthread_mutex_init(&dead, NULL) != 0)
+	{
+		pthread_mutex_destroy(&print);
+		return (put_error_fd(2, "mutex init failed\n"));
+	}
+	while (i < data[0].philo)
+	{
+		data[i].dead = dead;
+		data[i].print = print;
+		i++;
+	}
+	return (0);
+}
+
+int	create_forks(t_philo *data, pthread_mutex_t *forks)
+{
+	int i;
+
+	i = 0;
+	forks = malloc(sizeof(pthread_mutex_t) * data->philo);
+	if (!forks)
+		return (put_error_fd(2, "malloc failed\n"));
+	while (i < data->philo)
+	{
+		if (pthread_mutex_init(&forks[i], NULL) != 0)
+		{
+			destroy_mutex_array(forks, i);
+			free(forks);
+			return (put_error_fd(2, "mutex init failed\n"));
+		}
+		i++;
+	}
+	assign_forks(data, forks);
+	return (0);
+}
+
+int	init_struct(int argc, char** argv, t_philo *data , pthread_mutex_t *forks)
+{
+	int i;
+
+	int i = 0;
+	data = malloc(sizeof(t_philo) * data->philo);
+	if (!data)
+		return (put_error_fd(2, "malloc failed in main\n"));
+	while (i < data->philo)
+	{	
+		data[i].philo = ft_atoi(argv[1]);
+		data[i].die_time = ft_atoi(argv[2]);
+		data[i].eat_time = ft_atoi(argv[3]);
+		data[i].sleep_time = ft_atoi(argv[4]);
+		if (argc == 6)
+			data[i].max_meals = ft_atoi(argv[5]);
+		else
+			data[i].max_meals = 0;
+		data[i].alive = 1;
+		data[i].meals_ate = 0;
+		data[i].last_ate = 0;
+		i++;
+	}
+	if (create_mutex(data, forks) == -1)
+		return (-1);
+	return (0);	
+}
+
 int main(int argc, char** argv)
 {
-	t_philo data;
+	t_philo 		*data;
+	pthread_mutex_t *forks;
+	pthread_mutex_t dead;
+	pthread_mutex_t print;
 	
     if (argc == 5 || argc == 6)
 	{
 		if (check_args(argc, argv) == -1)
 			return (put_error_fd(2, "Invalid arguments!\n"));
-		if (init_struct(argc, argv, &data) == -1)
+		if (init_struct(argc, argv, data, forks) == -1)
 			return (-1);
+		if (create_rest_of_mutex(print, dead, data) == -1)
+		{
+			destroy_mutex_array(forks, data->philo);
+			free(data);
+			return (-1);
+		}
 		if (simulation(&data) == -1)
 			return (-1);
-		return (destroy_mutex(&data, data.philo));
+		return (destroy_mutex_array(forks, data->philo));
 	}
     else
 		return (put_error_fd(2, "Wrong number of ARGS!\n"));
