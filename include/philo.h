@@ -16,9 +16,10 @@ typedef struct s_philo
     int				sleep_time;
     int				max_meals;
     int 			*philo_num;
-    int 			dead_flag;
+    int 			alive;
     int 			*meals_ate;
     int				*last_ate;
+    pthread_mutex_t dead;
     pthread_mutex_t *forks;
 	pthread_mutex_t print;
 } t_philo;

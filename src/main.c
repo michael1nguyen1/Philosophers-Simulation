@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/06/20 23:29:59 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/06/21 18:36:13 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,7 @@ int	destroy_mutex(t_philo *data, int amount)
 	i = 0;
 	while (i < amount)
 	{
-		if (pthread_mutex_destroy(&data->forks[i]) != 0)
-			return (put_error_fd(2, "mutex destroy failed\n"));
+		pthread_mutex_destroy(&data->forks[i]);
 		i++;
 	}
 	return (0);
@@ -74,11 +73,20 @@ int init_mutex(t_philo *data)
 	while (i < data->philo)
 	{	
 		if (pthread_mutex_init(&data->forks[i], NULL) != 0)
+		{
+			destroy_mutex(data, i + 1);
 			return (put_error_fd(2, "mutex init failed"));
+		}
 		i++;
 	}
 	if (pthread_mutex_init(&data->print, NULL) != 0)
 	{
+		destroy_mutex(data, data->philo);
+		return (put_error_fd(2, "mutex init failed"));
+	}
+	if (pthread_mutex_init(&data->dead, NULL) != 0)
+	{
+		pthread_mutex_destroy(&data->print);
 		destroy_mutex(data, data->philo);
 		return (put_error_fd(2, "mutex init failed"));
 	}
@@ -96,7 +104,7 @@ int	init_struct(int argc, char** argv, t_philo *data)
 	else
 		data->max_meals = 0;
 	data->philo_num = 0;
-	data->dead_flag = 1;
+	data->alive = 1;
 	data->meals_ate = malloc(sizeof(int) * data->philo);
 	data->last_ate = malloc(sizeof(int) * data->philo);
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->philo);
@@ -132,10 +140,9 @@ int	eat(t_philo *data)
 	if (time - data->last_ate[*data->philo_num] > data->die_time)
 	{
 		printf("Philo %d has died\n", *data->philo_num + 1);
-		data->dead_flag = 0;
+		data->alive = 0;
 		return (1);
 	}
-	printf("Philo num is %d is\n", *data->philo_num);
 	printf("Philo %d is eating\n", *data->philo_num + 1);
 	usleep(data->eat_time);
 	return (0);
@@ -145,13 +152,20 @@ void *philo_life(void *arg)
 {
 	t_philo *data;
 
-	printf("philo life\n");
 	data = (t_philo*)arg;
-	while (data->dead_flag)
+	printf("philo %p has entered life\n", data->philo_num);
+	data->last_ate[*data->philo_num] = get_time();
+	while (data->alive)
 	{
-		data->last_ate[*data->philo_num] = get_time();
+		pthread_mutex_lock(&data->dead);
+		if (!data->alive)
+		{
+			pthread_mutex_unlock(&data->dead);
+			break;
+		}
+		pthread_mutex_unlock(&data->dead);
 		eat(data);
-		// break;
+		break;
 	}
 	free(data->philo_num);
 	return NULL;
@@ -169,7 +183,6 @@ int	simulation(t_philo *data)
 		if (!data->philo_num)
 			return(put_error_fd(2, "malloc in simulation failed\n"));
 		*data->philo_num = i;
-		printf("philo num in sim%d\n", *data->philo_num);
 		if (pthread_create(&thread[i], NULL, &philo_life, data) != 0)
 			return(put_error_fd(2, "thread failed\n"));
 		i++;
@@ -182,7 +195,7 @@ int	simulation(t_philo *data)
 	}
 	return (0);
 }
-//test these things
+
 int main(int argc, char** argv)
 {
 	t_philo data;
