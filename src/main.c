@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/06/27 22:06:44 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/06/27 22:49:24 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,20 +78,38 @@ int	go_to_sleep(t_philo *data)
 	pthread_mutex_unlock(&data->print);
 	return (0);
 }
-
+void	print_actions(t_philo *data, char *str)
+{
+	pthread_mutex_lock(&data->print);
+	printf("%d %d %s\n", get_time(), data->philo_id, str);
+	pthread_mutex_unlock(&data->print);
+}
 int	eat(t_philo **data)
 {
-	pthread_mutex_lock(&(*data)->print);
 	pthread_mutex_lock((*data)->left_fork);
+	print_actions(*data, "has taken a left fork");
 	pthread_mutex_lock((*data)->right_fork);
-	printf("%d %d has taken left fork\n", get_time(), (*data)->philo_id);
-	printf("%d %d has taken a right fork\n", get_time(), (*data)->philo_id);
-	printf("%d %d is eating\n", get_time(), (*data)->philo_id);
-	if ((*data)->last_ate + (*data)->eat_time < (*data)->last_ate + (*data)->die_time)
+	print_actions(*data, "has taken a right fork");
+	print_actions(*data, "is eating");
+	if ((*data)->max_meals > 0 && (*data)->meals_ate == (*data)->max_meals)
 	{
-		// set flag death
-		usleep((*data)->die_time - (*data)->eat_time);
-		printf("%d %d died\n", get_time(), (*data)->philo_id);
+		pthread_mutex_lock(&(*data)->dead);
+		(*data)->alive = 0;
+		pthread_mutex_unlock(&(*data)->dead);
+		pthread_mutex_unlock((*data)->left_fork);
+		pthread_mutex_unlock((*data)->right_fork);
+		print_actions(*data, "is full");
+		return (0);
+	}
+	else if (get_time() - (*data)->last_ate > (*data)->die_time)
+	{
+		pthread_mutex_lock(&(*data)->dead);
+		(*data)->alive = 0;
+		pthread_mutex_unlock(&(*data)->dead);
+		pthread_mutex_unlock((*data)->left_fork);
+		pthread_mutex_unlock((*data)->right_fork);
+		print_actions(*data, "died");
+		return (0);
 	}
 	else
 		usleep((*data)->eat_time);
@@ -107,18 +125,14 @@ int	eat(t_philo **data)
 void *philo_life(void *arg)
 {
 	t_philo *data;
-
+	
 	data = (t_philo*)arg;
-	// printf("philo %d is in life\n", (*data).philo_id);
-	// for (int i = 0; i < data[0].philo; i++)
-	// 	printf("philo %d is init\n", data[i].philo_id);
 	if (data->philo_id % 2 == 0)
-		usleep(100);
+		usleep(150);
 	while (data->alive)
 	{
 		eat(&data);
 		go_to_sleep(data);
-		// break;
 	}
 	printf("philo %d exited life\n", data->philo_id);
 	return NULL;
