@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/06/27 20:10:52 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/06/27 22:06:44 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int	get_time()
 {
 	struct timeval	time;
 	int 			seconds;
-	int			useconds;
+	int				useconds;
 	int				total;
 
 	gettimeofday(&time, NULL);
@@ -69,29 +69,38 @@ int	get_time()
 	return (total);
 }
 
-int	eat(t_philo *data)
+int	go_to_sleep(t_philo *data)
 {
-
 	pthread_mutex_lock(&data->print);
-	pthread_mutex_lock(data->left_fork);
-	printf("%d %d has taken left fork\n", get_time(), data->philo_id);
-	pthread_mutex_lock(data->right_fork);
-	printf("%d %d has taken a right fork\n", get_time(), data->philo_id);
-	printf("%d %d is eating\n", get_time(), data->philo_id);
-	if (data->last_ate + data->eat_time < data->last_ate + data->die_time)
+	printf("%d %d is sleeping\n", get_time(), data->philo_id);
+	usleep(data->sleep_time);
+	printf("%d %d is thinking\n", get_time(), data->philo_id);
+	pthread_mutex_unlock(&data->print);
+	return (0);
+}
+
+int	eat(t_philo **data)
+{
+	pthread_mutex_lock(&(*data)->print);
+	pthread_mutex_lock((*data)->left_fork);
+	pthread_mutex_lock((*data)->right_fork);
+	printf("%d %d has taken left fork\n", get_time(), (*data)->philo_id);
+	printf("%d %d has taken a right fork\n", get_time(), (*data)->philo_id);
+	printf("%d %d is eating\n", get_time(), (*data)->philo_id);
+	if ((*data)->last_ate + (*data)->eat_time < (*data)->last_ate + (*data)->die_time)
 	{
 		// set flag death
-		usleep(data->die_time - data->eat_time);
-		printf("%d %d died\n", get_time(), data->philo_id);
+		usleep((*data)->die_time - (*data)->eat_time);
+		printf("%d %d died\n", get_time(), (*data)->philo_id);
 	}
 	else
-		usleep(data->eat_time);
-	pthread_mutex_unlock(data->left_fork);
-	pthread_mutex_unlock(data->right_fork);
-	pthread_mutex_unlock(&data->print);
-	data->last_ate = get_time();
-	data->meals_ate++; //check 6th arg
-	printf("eat has ended\n");
+		usleep((*data)->eat_time);
+	pthread_mutex_unlock((*data)->left_fork);
+	pthread_mutex_unlock((*data)->right_fork);
+	(*data)->last_ate = get_time();
+	(*data)->meals_ate++; //check 6th arg
+	printf("philo %d is done eating\n", (*data)->philo_id);
+	pthread_mutex_unlock(&(*data)->print);
 	return (0);
 }
 
@@ -100,11 +109,15 @@ void *philo_life(void *arg)
 	t_philo *data;
 
 	data = (t_philo*)arg;
+	// printf("philo %d is in life\n", (*data).philo_id);
 	// for (int i = 0; i < data[0].philo; i++)
 	// 	printf("philo %d is init\n", data[i].philo_id);
+	if (data->philo_id % 2 == 0)
+		usleep(100);
 	while (data->alive)
 	{
-		eat(data);
+		eat(&data);
+		go_to_sleep(data);
 		// break;
 	}
 	printf("philo %d exited life\n", data->philo_id);
@@ -117,10 +130,12 @@ int	simulation(t_philo **data)
 	int i;
 	
 	i = 0;
-	printf("simulation started there are %d philos\n", (*data)[0].philo);
+	// for (int i = 0; i < (*data)[0].philo; i++)
+	// printf("there are %d phlos \n", (*data)[0].philo);
 	while (i < (*data)[0].philo)
 	{
-		if (pthread_create(&thread[i], NULL, &philo_life, data[i]) != 0)
+		// printf("philo is entering sim %d\n", (*data)[i].philo_id);
+		if (pthread_create(&thread[i], NULL, &philo_life, &(*data)[i]) != 0)
 			return(put_error_fd(2, "thread failed\n"));
 		i++;
 	}
