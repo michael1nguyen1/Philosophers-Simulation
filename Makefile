@@ -3,7 +3,7 @@ HEADERS	= -I ./include
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-DEBUG_CFLAGS = -fsanitize=address -g3
+DEBUG_CFLAGS = -g3
 SRCS = src/main.c	src/ft_atoi.c
 OBJS = $(SRCS:.c=.o)
 RM = rm -f
@@ -18,7 +18,7 @@ debug: re
 	$(CC) $(OBJS) $(HEADERS) $(DEBUG_CFLAGS) $(CFLAGS) -o $(NAME)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@ $(HEADERS)
+	$(CC) $(DEBUG_CFLAGS) $(CFLAGS) -c $< -o $@ $(HEADERS)
 
 clean:
 	$(RM) $(OBJS)

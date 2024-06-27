@@ -15,6 +15,7 @@ typedef struct s_philo
     int				eat_time;
     int				sleep_time;
     int				max_meals;
+    int             philo_id;
     int 			alive;
     int 			meals_ate;
     int				last_ate;
