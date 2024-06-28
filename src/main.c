@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/06/27 22:49:24 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/06/28 13:12:22 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,12 +78,14 @@ int	go_to_sleep(t_philo *data)
 	pthread_mutex_unlock(&data->print);
 	return (0);
 }
+
 void	print_actions(t_philo *data, char *str)
 {
 	pthread_mutex_lock(&data->print);
 	printf("%d %d %s\n", get_time(), data->philo_id, str);
 	pthread_mutex_unlock(&data->print);
 }
+
 int	eat(t_philo **data)
 {
 	pthread_mutex_lock((*data)->left_fork);
