@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/06/28 16:10:30 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:22:44 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,12 @@ void *philo_life(void *arg)
 		usleep(150);
 	while (data->alive)
 	{
+		if (data->alive == 0)
+			break;
 		eat(&data);
+		printf("done eating\n");
+		if (data->alive == 0)
+			break;
 		go_to_sleep(data);
 	}
 	// printf("philo %d exited life\n", data->philo_id);
@@ -167,11 +172,13 @@ void	*creeper_life(void *arg)
 				print_actions(&(*data)[i++], "died");
 				continue;
 			}
+		// pthread_mutex_lock((*data)[i].left_fork);
 		}
 		i++;
 		if (count == (*data)[0].philo)
 			break;
 	}
+	// pthread_mutex_unlock((*data)->left_fork);
 	return (NULL);
 }
 
