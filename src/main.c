@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/06/28 13:12:22 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/06/28 16:10:30 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ int	eat(t_philo **data)
 		pthread_mutex_unlock(&(*data)->dead);
 		pthread_mutex_unlock((*data)->left_fork);
 		pthread_mutex_unlock((*data)->right_fork);
-		print_actions(*data, "died");
+		// print_actions(*data, "died");
 		return (0);
 	}
 	else
@@ -136,26 +136,63 @@ void *philo_life(void *arg)
 		eat(&data);
 		go_to_sleep(data);
 	}
-	printf("philo %d exited life\n", data->philo_id);
+	// printf("philo %d exited life\n", data->philo_id);
 	return NULL;
+}
+
+void	*creeper_life(void *arg)
+{
+	int	i;
+	int	printed;
+	int count;
+
+	t_philo **data;
+	data = (t_philo**)arg;
+	i = 0;
+	printed = 0;
+	count = 1;
+	printf("CREEPER is alive\n");
+	while (1)
+	{
+		if (i + 1 == (*data)[0].philo)
+			i = 0;
+		if ((*data)[i].alive == 0)
+		{
+			(*data)[i].alive = 1;
+			count++;
+			// printf("count is %d\n", count);
+			if (printed == 0)
+			{
+				printed = 1;
+				print_actions(&(*data)[i++], "died");
+				continue;
+			}
+		}
+		i++;
+		if (count == (*data)[0].philo)
+			break;
+	}
+	return (NULL);
 }
 
 int	simulation(t_philo **data)
 {
 	pthread_t thread[(*data)[0].philo];
+	pthread_t creeper;
 	int i;
 	
 	i = 0;
-	// for (int i = 0; i < (*data)[0].philo; i++)
-	// printf("there are %d phlos \n", (*data)[0].philo);
+	if (pthread_create(&creeper, NULL, &creeper_life, data) != 0)
+		return(put_error_fd(2, "thread failed\n"));
 	while (i < (*data)[0].philo)
 	{
-		// printf("philo is entering sim %d\n", (*data)[i].philo_id);
 		if (pthread_create(&thread[i], NULL, &philo_life, &(*data)[i]) != 0)
 			return(put_error_fd(2, "thread failed\n"));
 		i++;
 	}
 	i = 0;
+	if(pthread_join(creeper, NULL) != 0)
+		return(put_error_fd(2, "joined failed\n"));
 	while (i < (*data)[0].philo)
 	{
 		if(pthread_join(thread[i++],NULL) != 0)
@@ -264,8 +301,6 @@ int main(int argc, char** argv)
 	pthread_mutex_t dead;
 	pthread_mutex_t print;
 
-	// data = NULL;
-	// forks = NULL;
     if (argc == 5 || argc == 6)
 	{
 		if (check_args(argc, argv) == -1)

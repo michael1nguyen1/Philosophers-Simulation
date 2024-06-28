@@ -25,6 +25,11 @@ typedef struct s_philo
 	pthread_mutex_t print;
 } t_philo;
 
+typedef struct s_creeper
+{
+    t_philo *data;
+} t_creeper;
+
 int     ft_atoi(const char *str);
 
 #endif
