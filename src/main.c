@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/06/28 16:22:44 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/01 20:36:43 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,9 +72,9 @@ int	get_time()
 int	go_to_sleep(t_philo *data)
 {
 	pthread_mutex_lock(&data->print);
-	printf("%d %d is sleeping\n", get_time(), data->philo_id);
+	printf("%d %d is sleeping\n", get_time() - data->start_time, data->philo_id);
 	usleep(data->sleep_time);
-	printf("%d %d is thinking\n", get_time(), data->philo_id);
+	printf("%d %d is thinking\n", get_time() - data->start_time, data->philo_id);
 	pthread_mutex_unlock(&data->print);
 	return (0);
 }
@@ -82,18 +82,22 @@ int	go_to_sleep(t_philo *data)
 void	print_actions(t_philo *data, char *str)
 {
 	pthread_mutex_lock(&data->print);
-	printf("%d %d %s\n", get_time(), data->philo_id, str);
+	printf("%d %d %s\n", get_time() - data->start_time, data->philo_id, str);
 	pthread_mutex_unlock(&data->print);
 }
 
-int	eat(t_philo **data)
+int	eat(t_philo *data)
 {
 	pthread_mutex_lock((*data)->left_fork);
 	print_actions(*data, "has taken a left fork");
 	pthread_mutex_lock((*data)->right_fork);
 	print_actions(*data, "has taken a right fork");
 	print_actions(*data, "is eating");
-	if ((*data)->max_meals > 0 && (*data)->meals_ate == (*data)->max_meals)
+	// printf("first %d\n", get_time() - (*data)->last_ate);
+	// printf("first . 5 %d\n", (*data)->last_ate);
+	// printf("second %d\n", (*data)->die_time);
+	if ((*data)->max_meals > 0 && (*data)->meals_ate == (*data)->max_meals &&
+		(*data)->alive == 1)
 	{
 		pthread_mutex_lock(&(*data)->dead);
 		(*data)->alive = 0;
@@ -103,21 +107,25 @@ int	eat(t_philo **data)
 		print_actions(*data, "is full");
 		return (0);
 	}
-	else if (get_time() - (*data)->last_ate > (*data)->die_time)
+	else if (get_time() - (*data)->last_ate > (*data)->die_time &&
+		(*data)->alive == 1)
 	{
+	printf("Here\n");
+		usleep(get_time() - (*data)->last_ate);
 		pthread_mutex_lock(&(*data)->dead);
 		(*data)->alive = 0;
 		pthread_mutex_unlock(&(*data)->dead);
 		pthread_mutex_unlock((*data)->left_fork);
 		pthread_mutex_unlock((*data)->right_fork);
-		// print_actions(*data, "died");
+		print_actions(*data, "died");
 		return (0);
 	}
 	else
 		usleep((*data)->eat_time);
 	pthread_mutex_unlock((*data)->left_fork);
 	pthread_mutex_unlock((*data)->right_fork);
-	(*data)->last_ate = get_time();
+	(*data)->last_ate = get_time() - (*data)->start_time;
+	// printf("last ate is %i\n", (*data)->last_ate);
 	(*data)->meals_ate++; //check 6th arg
 	printf("philo %d is done eating\n", (*data)->philo_id);
 	pthread_mutex_unlock(&(*data)->print);
@@ -127,80 +135,92 @@ int	eat(t_philo **data)
 void *philo_life(void *arg)
 {
 	t_philo *data;
-	
 	data = (t_philo*)arg;
 	if (data->philo_id % 2 == 0)
 		usleep(150);
+	pthread_mutex_lock(&data->dead);
 	while (data->alive)
 	{
 		if (data->alive == 0)
+		{
+			pthread_mutex_unlock(&data->dead);
 			break;
+		}
+		pthread_mutex_unlock(&data->dead);
 		eat(&data);
-		printf("done eating\n");
+		pthread_mutex_lock(&data->dead);
 		if (data->alive == 0)
+		{
+			printf("Here2\n");
+			pthread_mutex_unlock(&data->dead);
 			break;
+		}
+		pthread_mutex_unlock(&data->dead);
 		go_to_sleep(data);
 	}
-	// printf("philo %d exited life\n", data->philo_id);
+	printf("philo %d exited life\n", data->philo_id);
 	return NULL;
 }
 
-void	*creeper_life(void *arg)
-{
-	int	i;
-	int	printed;
-	int count;
+// void	*creeper_life(void *arg)
+// {
+// 	int	i;
+// 	int	printed;
+// 	int count;
 
-	t_philo **data;
-	data = (t_philo**)arg;
-	i = 0;
-	printed = 0;
-	count = 1;
-	printf("CREEPER is alive\n");
-	while (1)
-	{
-		if (i + 1 == (*data)[0].philo)
-			i = 0;
-		if ((*data)[i].alive == 0)
-		{
-			(*data)[i].alive = 1;
-			count++;
-			// printf("count is %d\n", count);
-			if (printed == 0)
-			{
-				printed = 1;
-				print_actions(&(*data)[i++], "died");
-				continue;
-			}
-		// pthread_mutex_lock((*data)[i].left_fork);
-		}
-		i++;
-		if (count == (*data)[0].philo)
-			break;
-	}
-	// pthread_mutex_unlock((*data)->left_fork);
-	return (NULL);
-}
+// 	t_philo **data;
+// 	data = (t_philo**)arg;
+// 	i = 0;
+// 	printed = 0;
+// 	count = 1;
+// 	printf("CREEPER is alive\n");
+// 	while (1)
+// 	{
+// 		if (i + 1 == (*data)[0].philo)
+// 			i = 0;
+// 		if ((*data)[i].alive == 0)
+// 		{
+// 			(*data)[i].alive = 1;
+// 			count++;
+// 			// printf("count is %d\n", count);
+// 			if (printed == 0)
+// 			{
+// 				printed = 1;
+// 				print_actions(&(*data)[i++], "died");
+// 				continue;
+// 			}
+// 		// pthread_mutex_lock((*data)[i].left_fork);
+// 		}
+// 		i++;
+// 		if (count == (*data)[0].philo)
+// 			break;
+// 	}
+// 	// pthread_mutex_unlock((*data)->left_fork);
+// 	return (NULL);
+// }
 
-int	simulation(t_philo **data)
+int	simulation(t_philo *data)
 {
-	pthread_t thread[(*data)[0].philo];
-	pthread_t creeper;
+	pthread_t thread[data[0].philo];
+	// pthread_t creeper;
 	int i;
+	int	death;
 	
+	death = 1;
 	i = 0;
-	if (pthread_create(&creeper, NULL, &creeper_life, data) != 0)
-		return(put_error_fd(2, "thread failed\n"));
-	while (i < (*data)[0].philo)
+	// if (pthread_create(&creeper, NULL, &creeper_life, data) != 0)
+	// 	return(put_error_fd(2, "thread failed\n"));
+	while (i < data[0].philo)
 	{
-		if (pthread_create(&thread[i], NULL, &philo_life, &(*data)[i]) != 0)
+		data[i].alive = &death;
+		if (pthread_create(&thread[i], NULL, &philo_life, data[i]) != 0)
 			return(put_error_fd(2, "thread failed\n"));
 		i++;
 	}
 	i = 0;
-	if(pthread_join(creeper, NULL) != 0)
-		return(put_error_fd(2, "joined failed\n"));
-	while (i < (*data)[0].philo)
+	// if(pthread_join(creeper, NULL) != 0)
+	// 	return(put_error_fd(2, "joined failed\n"));
+	while (i < data[0].philo)
 	{
 		if(pthread_join(thread[i++],NULL) != 0)
 			return(put_error_fd(2, "joined failed\n"));
@@ -288,9 +308,8 @@ int	init_struct(int argc, char** argv, t_philo **data , pthread_mutex_t **forks)
 		else
 			(*data)[i].max_meals = 0;
 		(*data)[i].philo_id = i + 1;
-		(*data)[i].alive = 1;
-		(*data)[i].meals_ate = 0;
-		(*data)[i].last_ate = 0;
+		(*data)[i].start_time = get_time();
+		(*data)[i].last_ate = get_time();
 		i++;
 	}
 	if(create_forks(*data, forks) == -1)
@@ -320,7 +339,7 @@ int main(int argc, char** argv)
 			free(data);
 			return (-1);
 		}
-		if (simulation(&data) == -1)
+		if (simulation(data) == -1)
 			return (-1);
 		return (destroy_mutex_array(forks, data->philo));
 	}

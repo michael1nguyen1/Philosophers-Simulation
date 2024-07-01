@@ -16,7 +16,8 @@ typedef struct s_philo
     int				sleep_time;
     int				max_meals;
     int             philo_id;
-    int 			alive;
+    int 			*alive;
+    int             start_time;
     int 			meals_ate;
     int				last_ate;
     pthread_mutex_t dead;
@@ -27,6 +28,7 @@ typedef struct s_philo
 
 typedef struct s_creeper
 {
+    int     death;
     t_philo *data;
 } t_creeper;
 
