@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/01 20:36:43 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/01 20:42:09 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,47 +88,47 @@ void	print_actions(t_philo *data, char *str)
 
 int	eat(t_philo *data)
 {
-	pthread_mutex_lock((*data)->left_fork);
-	print_actions(*data, "has taken a left fork");
-	pthread_mutex_lock((*data)->right_fork);
-	print_actions(*data, "has taken a right fork");
-	print_actions(*data, "is eating");
-	// printf("first %d\n", get_time() - (*data)->last_ate);
+	pthread_mutex_lock(data->left_fork);
+	print_actions(data, "has taken a left fork");
+	pthread_mutex_lock(data->right_fork);
+	print_actions(data, "has taken a right fork");
+	print_actions(data, "is eating");
+	printf("first %d\n", get_time() - data->last_ate);
 	// printf("first . 5 %d\n", (*data)->last_ate);
 	// printf("second %d\n", (*data)->die_time);
-	if ((*data)->max_meals > 0 && (*data)->meals_ate == (*data)->max_meals &&
-		(*data)->alive == 1)
+	if (data->max_meals > 0 && data->meals_ate == data->max_meals &&
+		*data->alive == 1)
 	{
-		pthread_mutex_lock(&(*data)->dead);
-		(*data)->alive = 0;
-		pthread_mutex_unlock(&(*data)->dead);
-		pthread_mutex_unlock((*data)->left_fork);
-		pthread_mutex_unlock((*data)->right_fork);
-		print_actions(*data, "is full");
+		pthread_mutex_lock(&data->dead);
+		data->alive = 0;
+		pthread_mutex_unlock(&data->dead);
+		pthread_mutex_unlock(data->left_fork);
+		pthread_mutex_unlock(data->right_fork);
+		print_actions(data, "is full");
 		return (0);
 	}
-	else if (get_time() - (*data)->last_ate > (*data)->die_time &&
-		(*data)->alive == 1)
+	else if (get_time() - data->last_ate > data->die_time &&
+		*data->alive == 1)
 	{
 	printf("Here\n");
-		usleep(get_time() - (*data)->last_ate);
-		pthread_mutex_lock(&(*data)->dead);
-		(*data)->alive = 0;
-		pthread_mutex_unlock(&(*data)->dead);
-		pthread_mutex_unlock((*data)->left_fork);
-		pthread_mutex_unlock((*data)->right_fork);
-		print_actions(*data, "died");
+		usleep(get_time() - data->last_ate);
+		pthread_mutex_lock(&data->dead);
+		data->alive = 0;
+		pthread_mutex_unlock(&data->dead);
+		pthread_mutex_unlock(data->left_fork);
+		pthread_mutex_unlock(data->right_fork);
+		print_actions(data, "died");
 		return (0);
 	}
 	else
-		usleep((*data)->eat_time);
-	pthread_mutex_unlock((*data)->left_fork);
-	pthread_mutex_unlock((*data)->right_fork);
-	(*data)->last_ate = get_time() - (*data)->start_time;
+		usleep(data->eat_time);
+	pthread_mutex_unlock(data->left_fork);
+	pthread_mutex_unlock(data->right_fork);
+	data->last_ate = get_time() - data->start_time;
 	// printf("last ate is %i\n", (*data)->last_ate);
-	(*data)->meals_ate++; //check 6th arg
-	printf("philo %d is done eating\n", (*data)->philo_id);
-	pthread_mutex_unlock(&(*data)->print);
+	data->meals_ate++; //check 6th arg
+	printf("philo %d is done eating\n", data->philo_id);
+	pthread_mutex_unlock(&data->print);
 	return (0);
 }
 
@@ -147,7 +147,7 @@ void *philo_life(void *arg)
 			break;
 		}
 		pthread_mutex_unlock(&data->dead);
-		eat(&data);
+		eat(data);
 		pthread_mutex_lock(&data->dead);
 		if (data->alive == 0)
 		{
@@ -213,7 +213,7 @@ int	simulation(t_philo *data)
 	while (i < data[0].philo)
 	{
 		data[i].alive = &death;
-		if (pthread_create(&thread[i], NULL, &philo_life, data[i]) != 0)
+		if (pthread_create(&thread[i], NULL, &philo_life, &data[i]) != 0)
 			return(put_error_fd(2, "thread failed\n"));
 		i++;
 	}
