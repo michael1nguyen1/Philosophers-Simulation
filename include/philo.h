@@ -33,5 +33,6 @@ typedef struct s_creeper
 } t_creeper;
 
 int     ft_atoi(const char *str);
+int     check_mutex(pthread_mutex_t check, t_philo *data);
 
 #endif

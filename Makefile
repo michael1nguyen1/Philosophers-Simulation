@@ -4,7 +4,7 @@ HEADERS	= -I ./include
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 DEBUG_CFLAGS = -g3
-SRCS = src/main.c	src/ft_atoi.c
+SRCS = src/main.c	src/ft_atoi.c	src/mutex_utils.c
 OBJS = $(SRCS:.c=.o)
 RM = rm -f
 
