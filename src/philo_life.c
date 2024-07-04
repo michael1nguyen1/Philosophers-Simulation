@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:46:25 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/04 22:10:01 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/04 22:53:36 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,7 @@ void	eat(t_philo *data)
 		print_actions(data, "died");
 		return ;
 	}
-	else if (data->max_meals > 0 && data->meals_ate == data->max_meals &&
-		check_mutex(data->dead, data))
-	{
-		print_actions(data, "is full");
-		return ;
-	}
-	else
+	else if (check_mutex(data->dead, data))
 	{
 		pick_up_forks(data);
 		data->last_ate = current_time(data);

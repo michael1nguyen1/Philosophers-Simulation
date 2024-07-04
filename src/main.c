@@ -6,12 +6,11 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/04 22:09:57 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/04 22:56:17 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
 
 void *philo_life(void *arg)
 {
@@ -20,11 +19,11 @@ void *philo_life(void *arg)
 	if (data->philo == 1)
 		return (lonely_philo(data));
 	if (data->philo_id % 2 == 0)
-		usleep(200);
+		usleep(500);
 	while (check_mutex(data->dead, data))
 	{
 		eat(data);
-		if (!check_mutex(data->dead, data) || (data->philo == 1))
+		if (!check_mutex(data->dead, data))
 			break;
 		go_to_sleep(data);
 		if (!check_mutex(data->dead, data))
