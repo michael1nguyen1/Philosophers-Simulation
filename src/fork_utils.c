@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 15:08:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/04 21:35:17 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/04 21:54:59 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,24 @@ void	my_usleep(t_philo *data, int time)
 		}
 		check_mutex(data->dead, data);
 		usleep(1000);
+		i++;
+	}
+}
+
+void	assign_forks(t_philo *data, pthread_mutex_t *forks)
+{
+	int i;
+
+	i = 0;
+	while (i < data[0].philo)
+	{
+		data[i].left_fork = &forks[i];
+		if (data->philo == 1)
+			data->right_fork = NULL;
+		else if (i == data->philo - 1)
+			data[i].right_fork = &forks[0];
+		else
+			data[i].right_fork = &forks[i + 1];
 		i++;
 	}
 }

@@ -6,181 +6,71 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/04 21:37:30 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/04 22:09:57 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	put_error_fd(int fd, char *str)
-{
-	int len;
-	
-	len = 0;
-	while (str[len])
-		len++;
-	write(fd, str, len);
-	return (-1);
-}
-
-int	check_args(int argc, char **argv)
-{
-	int i;
-	int j;
-
-	i = 1;
-	while (i < argc)
-	{
-		j = 0;
-		while (argv[i][j])
-		{
-			if (argv[i][j] != '+' && (argv[i][j] < '0' || argv[i][j] > '9'))
-				return (-1);
-			j++;
-		}
-		i++;
-	}
-	return (0);
-}
-
-int	destroy_mutex_array(pthread_mutex_t *forks, int amount)
-{
-	int	i;
-
-	i = 0;
-	while (i < amount)
-	{
-		pthread_mutex_destroy(&forks[i]);
-		i++;
-	}
-	return (0);
-}
-
-int	get_time()
-{
-	struct timeval	time;
-	int 			seconds;
-	int				useconds;
-	int				total;
-
-	gettimeofday(&time, NULL);
-	seconds = time.tv_sec;
-	useconds = time.tv_usec;
-	total = seconds * 1000 + useconds / 1000.0;
-	return (total);
-}
-
-int	current_time(t_philo *data)
-{
-	return (get_time() - data->start_time);
-}
-
-int	go_to_sleep(t_philo *data)
-{
-	pthread_mutex_lock(&data->print);
-	printf("%d %d is sleeping\n", current_time(data), data->philo_id);
-	my_usleep(data, data->sleep_time);
-	printf("%d %d is thinking\n", current_time(data), data->philo_id);
-	pthread_mutex_unlock(&data->print);
-	return (0);
-}
-
-void	print_actions(t_philo *data, char *str)
-{
-	pthread_mutex_lock(&data->print);
-	printf("%d %d %s\n", current_time(data), data->philo_id, str);
-	pthread_mutex_unlock(&data->print);
-}
-
-/*
--check if will die during eating(eat time is greater than die time)
-	sleep for the eat time
-	set flag and returns
-sets new eat time
-eats 
-++meals
-returns
-*/
-
-void	eat(t_philo *data)
-{
-	if (current_time(data) - data->last_ate > data->die_time && 
-		check_mutex(data->dead, data))
-	{
-			*data->alive = 0;
-			print_actions(data, "died");
-			return ;
-	}
-	else if (data->max_meals > 0 && data->meals_ate == data->max_meals &&
-		check_mutex(data->dead, data))
-	{
-		print_actions(data, "is full");
-		return ;
-	}
-	else
-	{
-		pick_up_forks(data);
-		data->last_ate = current_time(data);
-		my_usleep(data, data->eat_time);
-		data->meals_ate++;
-		put_down_forks(data);
-	}
-	return ;
-}
 
 void *philo_life(void *arg)
 {
 	t_philo *data;
 	data = (t_philo*)arg;
+	if (data->philo == 1)
+		return (lonely_philo(data));
 	if (data->philo_id % 2 == 0)
 		usleep(200);
 	while (check_mutex(data->dead, data))
 	{
 		eat(data);
-		if (!check_mutex(data->dead, data))
+		if (!check_mutex(data->dead, data) || (data->philo == 1))
 			break;
 		go_to_sleep(data);
+		if (!check_mutex(data->dead, data))
+			break;
+		thinking(data);
 	}
 	// printf("philo %d exited life\n", data->philo_id);
 	return NULL;
 }
 
-// void	*creeper_life(void *arg)
-// {
-// 	int	i;
-// 	int	printed;
-// 	int count;
+/*void	*creeper_life(void *arg)
+{
+	int	i;
+	int	printed;
+	int count;
 
-// 	t_philo **data;
-// 	data = (t_philo**)arg;
-// 	i = 0;
-// 	printed = 0;
-// 	count = 1;
-// 	printf("CREEPER is alive\n");
-// 	while (1)
-// 	{
-// 		if (i + 1 == (*data)[0].philo)
-// 			i = 0;
-// 		if ((*data)[i].alive == 0)
-// 		{
-// 			(*data)[i].alive = 1;
-// 			count++;
-// 			// printf("count is %d\n", count);
-// 			if (printed == 0)
-// 			{
-// 				printed = 1;
-// 				print_actions(&(*data)[i++], "died");
-// 				continue;
-// 			}
-// 		// pthread_mutex_lock((*data)[i].left_fork);
-// 		}
-// 		i++;
-// 		if (count == (*data)[0].philo)
-// 			break;
-// 	}
-// 	// pthread_mutex_unlock((*data)->left_fork);
-// 	return (NULL);
-// }
+	t_philo **data;
+	data = (t_philo**)arg;
+	i = 0;
+	printed = 0;
+	count = 1;
+	printf("CREEPER is alive\n");
+	while (1)
+	{
+		if (i + 1 == (*data)[0].philo)
+			i = 0;
+		if ((*data)[i].alive == 0)
+		{
+			(*data)[i].alive = 1;
+			count++;
+			// printf("count is %d\n", count);
+			if (printed == 0)
+			{
+				printed = 1;
+				print_actions(&(*data)[i++], "died");
+				continue;
+			}
+		// pthread_mutex_lock((*data)[i].left_fork);
+		}
+		i++;
+		if (count == (*data)[0].philo)
+			break;
+	}
+	// pthread_mutex_unlock((*data)->left_fork);
+	return (NULL);
+}*/ 
 
 int	simulation(t_philo *data)
 {
@@ -211,45 +101,6 @@ int	simulation(t_philo *data)
 	return (0);
 }
 
-void	assign_forks(t_philo *data, pthread_mutex_t *forks)
-{
-	int i;
-
-	i = 0;
-	while (i < data[0].philo)
-	{
-		data[i].left_fork = &forks[i];
-		if (data->philo == 1)
-			data->right_fork = NULL;
-		else if (i == data->philo - 1)
-			data[i].right_fork = &forks[0];
-		else
-			data[i].right_fork = &forks[i + 1];
-		i++;
-	}
-}
-
-int create_rest_of_mutex(pthread_mutex_t *print, pthread_mutex_t *dead, t_philo **data)
-{
-	int i;
-	
-	i = 0;
-	if (pthread_mutex_init(print, NULL) != 0)
-		return (put_error_fd(2, "mutex init failed\n"));
-	if (pthread_mutex_init(dead, NULL) != 0)
-	{
-		pthread_mutex_destroy(print);
-		return (put_error_fd(2, "mutex init failed\n"));
-	}
-	while (i < (*data)[0].philo)
-	{
-		(*data)[i].dead = *dead;
-		(*data)[i].print = *print;
-		i++;
-	}
-	return (0);
-}
-
 int	create_forks(t_philo *data, pthread_mutex_t **forks)
 {
 	int i;
@@ -270,37 +121,6 @@ int	create_forks(t_philo *data, pthread_mutex_t **forks)
 	}
 	assign_forks(data, *forks);
 	return (0);
-}
-
-int	init_struct(int argc, char** argv, t_philo **data , pthread_mutex_t **forks)
-{
-	int i;
-
-	i = 0;
-	*data = malloc(sizeof(t_philo) * ft_atoi(argv[1]));
-	if (!*data)
-		return (put_error_fd(2, "malloc failed in main\n"));
-	while (i < ft_atoi(argv[1]))
-	{	
-		(*data)[i].philo = ft_atoi(argv[1]);
-		(*data)[i].die_time = ft_atoi(argv[2]);
-		(*data)[i].eat_time = ft_atoi(argv[3]);
-		(*data)[i].sleep_time = ft_atoi(argv[4]);
-		if (argc == 6)
-			(*data)[i].max_meals = ft_atoi(argv[5]);
-		else
-			(*data)[i].max_meals = 0;
-		(*data)[i].philo_id = i + 1;
-		(*data)[i].start_time = get_time();
-		(*data)[i].last_ate = current_time(*data);
-		i++;
-	}
-	if(create_forks(*data, forks) == -1)
-	{
-		free(data);
-		return (-1);
-	}
-	return (0);	
 }
 
 int main(int argc, char** argv)

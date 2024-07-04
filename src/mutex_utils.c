@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 13:27:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/02 14:10:28 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/04 21:56:44 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,4 +20,38 @@ int check_mutex(pthread_mutex_t check, t_philo *data)
     pthread_mutex_unlock(&check);
     // printf("ret is %i\n", ret);
         return (ret);
+}
+
+int	destroy_mutex_array(pthread_mutex_t *forks, int amount)
+{
+	int	i;
+
+	i = 0;
+	while (i < amount)
+	{
+		pthread_mutex_destroy(&forks[i]);
+		i++;
+	}
+	return (0);
+}
+
+int create_rest_of_mutex(pthread_mutex_t *print, pthread_mutex_t *dead, t_philo **data)
+{
+	int i;
+	
+	i = 0;
+	if (pthread_mutex_init(print, NULL) != 0)
+		return (put_error_fd(2, "mutex init failed\n"));
+	if (pthread_mutex_init(dead, NULL) != 0)
+	{
+		pthread_mutex_destroy(print);
+		return (put_error_fd(2, "mutex init failed\n"));
+	}
+	while (i < (*data)[0].philo)
+	{
+		(*data)[i].dead = *dead;
+		(*data)[i].print = *print;
+		i++;
+	}
+	return (0);
 }
