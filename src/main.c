@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/02 14:23:15 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/04 21:37:30 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ int	put_error_fd(int fd, char *str)
 {
 	int len;
 	
+	len = 0;
 	while (str[len])
 		len++;
 	write(fd, str, len);
@@ -78,7 +79,7 @@ int	go_to_sleep(t_philo *data)
 {
 	pthread_mutex_lock(&data->print);
 	printf("%d %d is sleeping\n", current_time(data), data->philo_id);
-	usleep(data->sleep_time);
+	my_usleep(data, data->sleep_time);
 	printf("%d %d is thinking\n", current_time(data), data->philo_id);
 	pthread_mutex_unlock(&data->print);
 	return (0);
@@ -91,44 +92,40 @@ void	print_actions(t_philo *data, char *str)
 	pthread_mutex_unlock(&data->print);
 }
 
-int	eat(t_philo *data)
+/*
+-check if will die during eating(eat time is greater than die time)
+	sleep for the eat time
+	set flag and returns
+sets new eat time
+eats 
+++meals
+returns
+*/
+
+void	eat(t_philo *data)
 {
-	pthread_mutex_lock(data->left_fork);
-	print_actions(data, "has taken left fork");
-	pthread_mutex_lock(data->right_fork);
-	print_actions(data, "has taken right fork");
-	data->last_ate = current_time(data);
-	print_actions(data, "is eating");
-	// printf("first %d\n", current_time(data));
-	// printf("first . 5 %d\n", data->last_ate);
-	// printf("second %d\n", data->die_time);
-	if (data->max_meals > 0 && data->meals_ate == data->max_meals &&
+	if (current_time(data) - data->last_ate > data->die_time && 
 		check_mutex(data->dead, data))
 	{
-		*data->alive = 0;
-		pthread_mutex_unlock(data->left_fork);
-		pthread_mutex_unlock(data->right_fork);
-		print_actions(data, "is full");
-		return (0);
+			*data->alive = 0;
+			print_actions(data, "died");
+			return ;
 	}
-	else if (current_time(data) - data->last_ate > data->die_time &&
+	else if (data->max_meals > 0 && data->meals_ate == data->max_meals &&
 		check_mutex(data->dead, data))
 	{
-		// usleep(current_time(data));
-		*data->alive = 0;
-		print_actions(data, "died");
-		pthread_mutex_unlock(data->left_fork);
-		pthread_mutex_unlock(data->right_fork);
-		return (0);
+		print_actions(data, "is full");
+		return ;
 	}
 	else
-		usleep(data->eat_time);
-	pthread_mutex_unlock(data->left_fork);
-	pthread_mutex_unlock(data->right_fork);
-	data->meals_ate++; //check 6th arg
-	// printf("philo %d is done eating\n", data->philo_id);
-	pthread_mutex_unlock(&data->print);
-	return (0);
+	{
+		pick_up_forks(data);
+		data->last_ate = current_time(data);
+		my_usleep(data, data->eat_time);
+		data->meals_ate++;
+		put_down_forks(data);
+	}
+	return ;
 }
 
 void *philo_life(void *arg)
@@ -136,7 +133,7 @@ void *philo_life(void *arg)
 	t_philo *data;
 	data = (t_philo*)arg;
 	if (data->philo_id % 2 == 0)
-		usleep(150);
+		usleep(200);
 	while (check_mutex(data->dead, data))
 	{
 		eat(data);
@@ -222,7 +219,9 @@ void	assign_forks(t_philo *data, pthread_mutex_t *forks)
 	while (i < data[0].philo)
 	{
 		data[i].left_fork = &forks[i];
-		if (i == data->philo - 1)
+		if (data->philo == 1)
+			data->right_fork = NULL;
+		else if (i == data->philo - 1)
 			data[i].right_fork = &forks[0];
 		else
 			data[i].right_fork = &forks[i + 1];
@@ -230,24 +229,22 @@ void	assign_forks(t_philo *data, pthread_mutex_t *forks)
 	}
 }
 
-int create_rest_of_mutex(pthread_mutex_t print, pthread_mutex_t dead, t_philo **data)
+int create_rest_of_mutex(pthread_mutex_t *print, pthread_mutex_t *dead, t_philo **data)
 {
 	int i;
 	
 	i = 0;
-	if (pthread_mutex_init(&print, NULL) != 0)
-	{
+	if (pthread_mutex_init(print, NULL) != 0)
 		return (put_error_fd(2, "mutex init failed\n"));
-	}
-	if (pthread_mutex_init(&dead, NULL) != 0)
+	if (pthread_mutex_init(dead, NULL) != 0)
 	{
-		pthread_mutex_destroy(&print);
+		pthread_mutex_destroy(print);
 		return (put_error_fd(2, "mutex init failed\n"));
 	}
 	while (i < (*data)[0].philo)
 	{
-		(*data)[i].dead = dead;
-		(*data)[i].print = print;
+		(*data)[i].dead = *dead;
+		(*data)[i].print = *print;
 		i++;
 	}
 	return (0);
@@ -295,7 +292,7 @@ int	init_struct(int argc, char** argv, t_philo **data , pthread_mutex_t **forks)
 			(*data)[i].max_meals = 0;
 		(*data)[i].philo_id = i + 1;
 		(*data)[i].start_time = get_time();
-		(*data)[i].last_ate = get_time();
+		(*data)[i].last_ate = current_time(*data);
 		i++;
 	}
 	if(create_forks(*data, forks) == -1)
@@ -319,7 +316,7 @@ int main(int argc, char** argv)
 			return (put_error_fd(2, "Invalid arguments!\n"));
 		if (init_struct(argc, argv, &data, &forks) == -1)
 			return (-1);
-		if (create_rest_of_mutex(print, dead, &data) == -1)
+		if (create_rest_of_mutex(&print, &dead, &data) == -1)
 		{
 			destroy_mutex_array(forks, data->philo);
 			free(data);
