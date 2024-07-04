@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 15:08:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/04 23:35:11 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/04 23:54:34 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ void	pick_up_forks(t_philo *data)
 		print_actions(data, "is eating");
 		data->last_ate = current_time(data);
 	}
-	return;
 }
 
 void	put_down_forks(t_philo *data)
@@ -35,7 +34,6 @@ void	put_down_forks(t_philo *data)
 	pthread_mutex_unlock(data->left_fork);
 	if (data->philo != 1)
 		pthread_mutex_unlock(data->right_fork);
-	return ;
 }
 
 void	my_usleep(t_philo *data, int time)

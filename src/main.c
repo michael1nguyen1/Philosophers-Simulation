@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/04 23:32:43 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 00:11:29 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,54 +34,29 @@ void *philo_life(void *arg)
 	return NULL;
 }
 
-/*void	*creeper_life(void *arg)
+void	*creeper_life(void *arg)
 {
-	int	i;
-	int	printed;
-	int count;
+	t_philo *data;
+	data = (t_philo*)arg;
 
-	t_philo **data;
-	data = (t_philo**)arg;
-	i = 0;
-	printed = 0;
-	count = 1;
-	printf("CREEPER is alive\n");
-	while (1)
+	while(1)
 	{
-		if (i + 1 == (*data)[0].philo)
-			i = 0;
-		if ((*data)[i].alive == 0)
-		{
-			(*data)[i].alive = 1;
-			count++;
-			// printf("count is %d\n", count);
-			if (printed == 0)
-			{
-				printed = 1;
-				print_actions(&(*data)[i++], "died");
-				continue;
-			}
-		// pthread_mutex_lock((*data)[i].left_fork);
-		}
-		i++;
-		if (count == (*data)[0].philo)
-			break;
+		if (data[0].meals_ate == data->max_meals)
+			*data->alive = 0;
 	}
-	// pthread_mutex_unlock((*data)->left_fork);
-	return (NULL);
-}*/ 
+}
 
 int	simulation(t_philo *data)
 {
 	pthread_t thread[data[0].philo];
-	// pthread_t creeper;
+	pthread_t creeper;
 	int i;
 	int	death;
 	
 	death = 1;
 	i = 0;
-	// if (pthread_create(&creeper, NULL, &creeper_life, data) != 0)
-	// 	return(put_error_fd(2, "thread failed\n"));
+	if (pthread_create(&creeper, NULL, &creeper_life, data) != 0)
+		return(put_error_fd(2, "thread failed\n"));
 	while (i < data[0].philo)
 	{
 		data[i].alive = &death;

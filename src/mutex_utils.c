@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 13:27:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/04 21:56:44 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 00:08:40 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,7 @@ int check_mutex(pthread_mutex_t check, t_philo *data)
     pthread_mutex_lock(&check);
         ret = *data->alive;
     pthread_mutex_unlock(&check);
-    // printf("ret is %i\n", ret);
-        return (ret);
+    return (ret);
 }
 
 int	destroy_mutex_array(pthread_mutex_t *forks, int amount)
@@ -32,6 +31,8 @@ int	destroy_mutex_array(pthread_mutex_t *forks, int amount)
 		pthread_mutex_destroy(&forks[i]);
 		i++;
 	}
+	free (forks);
+	
 	return (0);
 }
 
