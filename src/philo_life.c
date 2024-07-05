@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:46:25 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 15:29:08 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 18:44:07 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ void	go_to_sleep(t_philo *data)
 
 void	eat(t_philo *data)
 {
-	if (current_time(data) - data->last_ate > data->die_time && 
-		check_mutex(data->dead, data))
+	if (current_time(data) - data->last_ate > data->die_time
+		&& check_mutex(data->dead, data))
 	{
 		raise_dead_flag(data);
 		print_actions(data, "died");
@@ -54,6 +54,6 @@ void	*lonely_philo(t_philo *data)
 void	raise_dead_flag(t_philo *data)
 {
 	pthread_mutex_lock(data->dead);
-    *data->alive = 0;
-    pthread_mutex_unlock(data->dead);
+	*data->alive = 0;
+	pthread_mutex_unlock(data->dead);
 }

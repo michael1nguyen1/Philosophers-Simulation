@@ -1,21 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   time_funcs.c                                       :+:      :+:    :+:   */
+/*   time_fts.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:58:03 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/04 21:58:22 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 18:39:54 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	get_time()
+int	get_time(void)
 {
 	struct timeval	time;
-	int 			seconds;
+	int				seconds;
 	int				useconds;
 	int				total;
 

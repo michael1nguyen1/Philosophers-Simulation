@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:47:32 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 18:17:33 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 18:42:58 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 int	put_error_fd(int fd, char *str)
 {
-	int len;
-	
+	int	len;
+
 	len = 0;
 	while (str[len])
 		len++;
@@ -32,8 +32,8 @@ void	print_actions(t_philo *data, char *str)
 
 int	check_args(int argc, char **argv)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 1;
 	while (i < argc)
@@ -50,9 +50,9 @@ int	check_args(int argc, char **argv)
 	return (0);
 }
 
-int	init_struct(int argc, char** argv, t_philo **data , pthread_mutex_t **forks)
+int	init_struct(int argc, char **argv, t_philo **data, pthread_mutex_t **forks)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	*data = malloc(sizeof(t_philo) * ft_atoi(argv[1]));
@@ -74,13 +74,14 @@ int	init_struct(int argc, char** argv, t_philo **data , pthread_mutex_t **forks)
 		(*data)[i].last_ate = current_time(*data);
 		i++;
 	}
-	if(create_forks(*data, forks) == -1)
+	if (create_forks(*data, forks) == -1)
 	{
 		free(data);
 		return (-1);
 	}
-	return (0);	
+	return (0);
 }
+
 int	clean_up(pthread_mutex_t *forks, t_philo *data)
 {
 	destroy_mutex_array(forks, data->philo);

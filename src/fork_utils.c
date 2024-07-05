@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 15:08:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 15:44:22 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 18:44:39 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ void	my_usleep(t_philo *data, int time)
 	{
 		if (!check_mutex(data->dead, data))
 			return ;
-		else if (current_time(data) - data->last_ate > data->die_time &&
-			check_mutex(data->dead, data))
+		else if (current_time(data) - data->last_ate > data->die_time
+			&& check_mutex(data->dead, data))
 		{
 			raise_dead_flag(data);
 			print_actions(data, "died");
@@ -60,7 +60,7 @@ void	my_usleep(t_philo *data, int time)
 
 void	assign_forks(t_philo *data, pthread_mutex_t *forks)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < data[0].philo)
