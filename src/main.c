@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 00:11:29 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 12:22:21 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ int main(int argc, char** argv)
 		}
 		if (simulation(data) == -1)
 			return (-1);
+		printf("HERE1\n");
 		return (destroy_mutex_array(forks, data->philo));
 	}
     else

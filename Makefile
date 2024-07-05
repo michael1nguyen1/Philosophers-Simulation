@@ -19,7 +19,7 @@ debug: re
 	$(CC) $(OBJS) $(HEADERS) $(DEBUG_CFLAGS) $(CFLAGS) -o $(NAME)
 
 %.o: %.c
-	$(CC) $(DEBUG_CFLAGS) $(CFLAGS) -c $< -o $@ $(HEADERS)
+	$(CC) $(CFLAGS) -c $< -o $@ $(HEADERS)
 
 clean:
 	$(RM) $(OBJS)

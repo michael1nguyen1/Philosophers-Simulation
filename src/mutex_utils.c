@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 13:27:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 00:08:40 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 12:31:06 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,12 @@ int	destroy_mutex_array(pthread_mutex_t *forks, int amount)
 	i = 0;
 	while (i < amount)
 	{
+		printf("here in loop\n");
 		pthread_mutex_destroy(&forks[i]);
 		i++;
 	}
 	free (forks);
-	
+	printf("HERE\n");
 	return (0);
 }
 
