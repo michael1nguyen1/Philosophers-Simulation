@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:47:32 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/04 23:34:26 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 14:50:05 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ int	put_error_fd(int fd, char *str)
 
 void	print_actions(t_philo *data, char *str)
 {
-	pthread_mutex_lock(&data->print);
+	pthread_mutex_lock(data->print);
 	printf("%d %d %s\n", current_time(data), data->philo_id, str);
-	pthread_mutex_unlock(&data->print);
+	pthread_mutex_unlock(data->print);
 }
 
 int	check_args(int argc, char **argv)
@@ -67,7 +67,7 @@ int	init_struct(int argc, char** argv, t_philo **data , pthread_mutex_t **forks)
 		if (argc == 6)
 			(*data)[i].max_meals = ft_atoi(argv[5]);
 		else
-			(*data)[i].max_meals = 0;
+			(*data)[i].max_meals = -1;
 		(*data)[i].philo_id = i + 1;
 		(*data)[i].start_time = get_time();
 		(*data)[i].last_ate = current_time(*data);

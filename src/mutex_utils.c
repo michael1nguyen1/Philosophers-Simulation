@@ -6,18 +6,20 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 13:27:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 12:31:06 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 14:47:04 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int check_mutex(pthread_mutex_t check, t_philo *data)
+int check_mutex(pthread_mutex_t *check, t_philo *data)
 {
     int ret;
-    pthread_mutex_lock(&check);
+
+	// printf("wow: %p\n", data->alive);
+    pthread_mutex_lock(check);
         ret = *data->alive;
-    pthread_mutex_unlock(&check);
+    pthread_mutex_unlock(check);
     return (ret);
 }
 
@@ -28,12 +30,10 @@ int	destroy_mutex_array(pthread_mutex_t *forks, int amount)
 	i = 0;
 	while (i < amount)
 	{
-		printf("here in loop\n");
 		pthread_mutex_destroy(&forks[i]);
 		i++;
 	}
 	free (forks);
-	printf("HERE\n");
 	return (0);
 }
 
@@ -51,8 +51,8 @@ int create_rest_of_mutex(pthread_mutex_t *print, pthread_mutex_t *dead, t_philo 
 	}
 	while (i < (*data)[0].philo)
 	{
-		(*data)[i].dead = *dead;
-		(*data)[i].print = *print;
+		(*data)[i].dead = dead;
+		(*data)[i].print = print;
 		i++;
 	}
 	return (0);

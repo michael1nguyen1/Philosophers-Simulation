@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 12:22:21 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 15:05:20 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void *philo_life(void *arg)
 			break;
 		thinking(data);
 	}
-	// printf("philo %d exited life\n", data->philo_id);
+	printf("philo %d exited life\n", data->philo_id);
 	return NULL;
 }
 
@@ -41,9 +41,13 @@ void	*creeper_life(void *arg)
 
 	while(1)
 	{
-		if (data[0].meals_ate == data->max_meals)
+		if (data[0].meals_ate == data->max_meals || !check_mutex(data->dead, data))
+		{
 			*data->alive = 0;
+			break ;
+		}
 	}
+	return (NULL);
 }
 
 int	simulation(t_philo *data)
@@ -55,6 +59,7 @@ int	simulation(t_philo *data)
 	
 	death = 1;
 	i = 0;
+	data->alive = &death;
 	if (pthread_create(&creeper, NULL, &creeper_life, data) != 0)
 		return(put_error_fd(2, "thread failed\n"));
 	while (i < data[0].philo)
@@ -65,8 +70,8 @@ int	simulation(t_philo *data)
 		i++;
 	}
 	i = 0;
-	// if(pthread_join(creeper, NULL) != 0)
-	// 	return(put_error_fd(2, "joined failed\n"));
+	if (pthread_join(creeper, NULL) != 0)
+		return(put_error_fd(2, "joined failed\n"));
 	while (i < data[0].philo)
 	{
 		if(pthread_join(thread[i++],NULL) != 0)
@@ -118,7 +123,7 @@ int main(int argc, char** argv)
 		}
 		if (simulation(data) == -1)
 			return (-1);
-		printf("HERE1\n");
+		printf("returns to main\n");
 		return (destroy_mutex_array(forks, data->philo));
 	}
     else

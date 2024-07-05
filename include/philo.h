@@ -20,10 +20,10 @@ typedef struct s_philo
 	int             start_time;
 	int 			meals_ate;
 	int				last_ate;
-	pthread_mutex_t dead;
+	pthread_mutex_t *dead;
 	pthread_mutex_t *left_fork;
 	pthread_mutex_t *right_fork;
-	pthread_mutex_t print;
+	pthread_mutex_t *print;
 } t_philo;
 
 typedef struct s_creeper
@@ -39,7 +39,7 @@ int		init_struct(int argc, char** argv, t_philo **data ,pthread_mutex_t **forks)
 int		put_error_fd(int fd, char *str);
 void	print_actions(t_philo *data, char *str);
 
-int     check_mutex(pthread_mutex_t check, t_philo *data);
+int     check_mutex(pthread_mutex_t *check, t_philo *data);
 int		destroy_mutex_array(pthread_mutex_t *forks, int amount);
 int		create_rest_of_mutex(pthread_mutex_t *print, pthread_mutex_t *dead, t_philo **data);
 
