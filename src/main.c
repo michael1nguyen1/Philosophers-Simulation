@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 15:05:20 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 18:21:09 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void *philo_life(void *arg)
 		return (lonely_philo(data));
 	if (data->philo_id % 2 == 0)
 		usleep(500);
+	print_actions(data, "is thinking");
 	while (check_mutex(data->dead, data))
 	{
 		eat(data);
@@ -30,7 +31,7 @@ void *philo_life(void *arg)
 			break;
 		thinking(data);
 	}
-	printf("philo %d exited life\n", data->philo_id);
+	// printf("philo %d exited life\n", data->philo_id);
 	return NULL;
 }
 
@@ -43,7 +44,7 @@ void	*creeper_life(void *arg)
 	{
 		if (data[0].meals_ate == data->max_meals || !check_mutex(data->dead, data))
 		{
-			*data->alive = 0;
+			raise_dead_flag (data);
 			break ;
 		}
 	}
@@ -115,16 +116,13 @@ int main(int argc, char** argv)
 			return (put_error_fd(2, "Invalid arguments!\n"));
 		if (init_struct(argc, argv, &data, &forks) == -1)
 			return (-1);
-		if (create_rest_of_mutex(&print, &dead, &data) == -1)
+		if (create_rest_of_mutex(&print, &dead, &data) == -1 ||
+			simulation(data) == -1)
 		{
-			destroy_mutex_array(forks, data->philo);
-			free(data);
+			clean_up(forks,data);
 			return (-1);
 		}
-		if (simulation(data) == -1)
-			return (-1);
-		printf("returns to main\n");
-		return (destroy_mutex_array(forks, data->philo));
+		return (clean_up(forks, data));
 	}
     else
 		return (put_error_fd(2, "Wrong number of ARGS!\n"));

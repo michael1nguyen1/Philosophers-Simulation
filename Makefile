@@ -3,26 +3,31 @@ HEADERS	= -I ./include
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-DEBUG_CFLAGS = -g3 -fsanitize=address
-SRCS = 	src/main.c			src/ft_atoi.c	src/mutex_utils.c	src/fork_utils.c \
-		src/philo_life.c	src/utils.c		src/time_fts.c
+DEBUG_CFLAGS = -g3 #-fsanitize=address
+SRCS =  src/main.c src/ft_atoi.c src/mutex_utils.c src/fork_utils.c \
+		src/philo_life.c src/utils.c src/time_fts.c
 OBJS = $(SRCS:.c=.o)
+DEBUG_OBJS = $(SRCS:.c=.debug.o)
 RM = rm -f
 
 all: $(NAME)
 
-$(NAME):$(OBJS)
+$(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 	@echo "Program Made"
 
-debug: re
-	$(CC) $(OBJS) $(HEADERS) $(DEBUG_CFLAGS) $(CFLAGS) -o $(NAME)
+debug: $(DEBUG_OBJS)
+	$(CC) $(DEBUG_OBJS) $(HEADERS) $(DEBUG_CFLAGS) $(CFLAGS) -o $(NAME)
+	@echo "Debug Program Made"
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(HEADERS)
 
+%.debug.o: %.c
+	$(CC) $(CFLAGS) $(DEBUG_CFLAGS) -c $< -o $@ $(HEADERS)
+
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(OBJS) $(DEBUG_OBJS)
 	@echo "Cleaned object files"
 
 fclean: clean

@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:47:32 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 14:50:05 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/05 18:17:33 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ int	init_struct(int argc, char** argv, t_philo **data , pthread_mutex_t **forks)
 		else
 			(*data)[i].max_meals = -1;
 		(*data)[i].philo_id = i + 1;
+		(*data)[i].meals_ate = 0;
 		(*data)[i].start_time = get_time();
 		(*data)[i].last_ate = current_time(*data);
 		i++;
@@ -79,4 +80,13 @@ int	init_struct(int argc, char** argv, t_philo **data , pthread_mutex_t **forks)
 		return (-1);
 	}
 	return (0);	
+}
+int	clean_up(pthread_mutex_t *forks, t_philo *data)
+{
+	destroy_mutex_array(forks, data->philo);
+	if (forks)
+		free (forks);
+	if (data)
+		free (data);
+	return (0);
 }

@@ -42,6 +42,7 @@ void	print_actions(t_philo *data, char *str);
 int     check_mutex(pthread_mutex_t *check, t_philo *data);
 int		destroy_mutex_array(pthread_mutex_t *forks, int amount);
 int		create_rest_of_mutex(pthread_mutex_t *print, pthread_mutex_t *dead, t_philo **data);
+void	raise_dead_flag(t_philo *data);
 
 void	my_usleep(t_philo *data, int time);
 int		current_time(t_philo *data);
