@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/06 18:49:47 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 00:28:43 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,17 +45,20 @@ void	*creeper_life(void *arg)
 	data = (t_philo *)arg;
 	count = 0;
 	i = 0;
+	while (data[0].meals_ate != data->max_meals)
+		continue ;
 	while (1)
 	{
-		if (i == data->philo - 1)
+		if (data[i].meals_ate < data->max_meals)
 			i = 0;
-		if (data[i].meals_ate == data->max_meals)
+		else if (data[i].meals_ate == data->max_meals)
 			count++;
 		if (count == data->philo || !check_mutex(data->dead, data))
 		{
-			raise_dead_flag (data);
+			raise_dead_flag(data);
 			break ;	
 		}
+		i++;
 	}
 	return (NULL);
 }
@@ -69,9 +72,12 @@ int	simulation(t_philo *data)
 
 	death = 1;
 	i = 0;
-	data->alive = &death;
-	if (pthread_create(&creeper, NULL, &creeper_life, data) != 0)
-		return (put_error_fd(2, "thread failed\n"));
+	if (data->max_meals > 0 && data->philo > 1)
+	{
+		data->alive = &death;
+		if (pthread_create(&creeper, NULL, &creeper_life, data) != 0)
+			return (put_error_fd(2, "thread failed\n"));
+	}
 	while (i < data[0].philo)
 	{
 		data[i].alive = &death;
@@ -80,8 +86,11 @@ int	simulation(t_philo *data)
 		i++;
 	}
 	i = 0;
-	if (pthread_join(creeper, NULL) != 0)
-		return (put_error_fd(2, "joined failed\n"));
+	if (data->max_meals > 0 && data->philo > 1)
+	{
+		if (pthread_join(creeper, NULL) != 0)
+			return (put_error_fd(2, "joined failed\n"));
+	}
 	while (i < data[0].philo)
 	{
 		if (pthread_join(thread[i++], NULL) != 0)

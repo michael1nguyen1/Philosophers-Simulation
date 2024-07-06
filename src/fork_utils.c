@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 15:08:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 18:44:39 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 00:07:32 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,10 @@ void	my_usleep(t_philo *data, int time)
 {
 	int	start;
 
-	start = get_time();
+	start = current_time(data);
 	if (!check_mutex(data->dead, data))
 		return ;
-	while (get_time() - start < time)
+	while (current_time(data) - start < time)
 	{
 		if (!check_mutex(data->dead, data))
 			return ;
@@ -56,6 +56,8 @@ void	my_usleep(t_philo *data, int time)
 		}
 		usleep(500);
 	}
+	if (data->philo == 1)
+		print_actions(data, "died");
 }
 
 void	assign_forks(t_philo *data, pthread_mutex_t *forks)
