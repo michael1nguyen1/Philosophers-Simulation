@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/07 00:28:43 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 00:30:09 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	*creeper_life(void *arg)
 		if (count == data->philo || !check_mutex(data->dead, data))
 		{
 			raise_dead_flag(data);
-			break ;	
+			break ;
 		}
 		i++;
 	}
