@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 19:00:37 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 19:10:23 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/06 18:12:53 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ int		check_args(int argc, char **argv);
 int		init_struct(int argc, char **argv, t_philo **data,
 			pthread_mutex_t **forks);
 int		clean_up(pthread_mutex_t *forks, t_philo *data);
+int		check_overflow(char **argv);
 
 int		put_error_fd(int fd, char *str);
 void	print_actions(t_philo *data, char *str);
