@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/06 17:45:00 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/06 18:11:24 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/06 18:27:46 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,3 @@ int	check_overflow(char **argv)
 	}
 	return (0);
 }
-// int main(int argc, char **argv)
-// {
-// 	printf("%d\n", check_overflow(argv));
-// }

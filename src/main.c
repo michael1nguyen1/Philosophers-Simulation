@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 19:00:12 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/06 18:49:47 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,15 +39,22 @@ void	*philo_life(void *arg)
 void	*creeper_life(void *arg)
 {
 	t_philo	*data;
+	int		count;
+	int		i;
 
 	data = (t_philo *)arg;
+	count = 0;
+	i = 0;
 	while (1)
 	{
-		if (data[0].meals_ate == data->max_meals
-			|| !check_mutex(data->dead, data))
+		if (i == data->philo - 1)
+			i = 0;
+		if (data[i].meals_ate == data->max_meals)
+			count++;
+		if (count == data->philo || !check_mutex(data->dead, data))
 		{
 			raise_dead_flag (data);
-			break ;
+			break ;	
 		}
 	}
 	return (NULL);
