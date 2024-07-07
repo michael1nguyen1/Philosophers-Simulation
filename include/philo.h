@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 19:00:37 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/07 15:03:25 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 16:55:44 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ void	raise_dead_flag(t_philo *data);
 
 void	my_usleep(t_philo *data, int time);
 int		current_time(t_philo *data);
+int		get_time(void);
 
 int		create_forks(t_philo *data, pthread_mutex_t **forks);
 void	assign_forks(t_philo *data, pthread_mutex_t *forks);
@@ -76,7 +77,7 @@ void	go_to_sleep(t_philo *data);
 void	eat(t_philo *data);
 void	*lonely_philo(t_philo *data);
 
-int		current_time(t_philo *data);
-int		get_time(void);
+int		check_meals(int *meals, t_philo *data);
+void	count_meals(t_philo *data);
 
 #endif

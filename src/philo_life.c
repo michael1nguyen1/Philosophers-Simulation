@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:46:25 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/05 18:44:07 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 16:55:09 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	eat(t_philo *data)
 		pick_up_forks(data);
 		data->last_ate = current_time(data);
 		my_usleep(data, data->eat_time);
-		data->meals_ate++;
+		count_meals(data);
 		put_down_forks(data);
 	}
 	return ;

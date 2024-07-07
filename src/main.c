@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/07 14:59:52 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 18:10:35 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,24 +36,20 @@ void	*philo_life(void *arg)
 	return (NULL);
 }
 
+
 void	*creeper_life(void *arg)
 {
 	t_philo	*data;
-	int		count;
 	int		i;
 
 	data = (t_philo *)arg;
-	count = 0;
 	i = 0;
-	while (data[0].meals_ate != data->max_meals && check_mutex(data->dead, data))
-		continue ;
 	while (1)
 	{
-		if (data[i].meals_ate < data->max_meals)
-			i = 0;
-		else if (data[i].meals_ate == data->max_meals)
-			count++;
-		if (count == data->philo || !check_mutex(data->dead, data))
+		if (!check_meals(&data[i].meals_ate, &data[i])
+			&& check_mutex(data->dead, data))
+			i--;
+		if (i == data->philo - 1 || !check_mutex(data->dead, data))
 		{
 			raise_dead_flag(data);
 			break ;
@@ -79,7 +75,9 @@ int	simulation(t_philo *data)
 	}
 	while (i < data[0].philo)
 	{
+		pthread_mutex_lock(data[i].dead);
 		data[i].alive = &death;
+		pthread_mutex_unlock(data[i].dead);
 		if (pthread_create(&data[i].thread, NULL, &philo_life, &data[i]) != 0)
 			return (put_error_fd(2, "thread failed\n"));
 		i++;
