@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:47:32 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/06 18:27:14 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 14:50:34 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,12 +86,16 @@ int	init_struct(int argc, char **argv, t_philo **data, pthread_mutex_t **forks)
 	return (0);
 }
 
-int	clean_up(pthread_mutex_t *forks, t_philo *data)
+int	clean_up(pthread_mutex_t *forks, t_philo *data,
+	pthread_mutex_t *dead, pthread_mutex_t *print)
 {
 	destroy_mutex_array(forks, data->philo);
 	if (forks)
 		free (forks);
 	if (data)
 		free (data);
+	pthread_mutex_destroy(dead);
+	pthread_mutex_destroy(print);
+	pthread_mutex_destroy(data->meals);
 	return (0);
 }

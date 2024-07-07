@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 19:00:37 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/06 18:12:53 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 15:03:25 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ typedef struct s_philo
 	int				start_time;
 	int				meals_ate;
 	int				last_ate;
+	pthread_t		thread;
+	pthread_mutex_t	*meals;
 	pthread_mutex_t	*dead;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
@@ -48,7 +50,8 @@ int		ft_atoi(const char *str);
 int		check_args(int argc, char **argv);
 int		init_struct(int argc, char **argv, t_philo **data,
 			pthread_mutex_t **forks);
-int		clean_up(pthread_mutex_t *forks, t_philo *data);
+int		clean_up(pthread_mutex_t *forks, t_philo *data,
+			pthread_mutex_t *dead, pthread_mutex_t *print);
 int		check_overflow(char **argv);
 
 int		put_error_fd(int fd, char *str);
@@ -57,7 +60,7 @@ void	print_actions(t_philo *data, char *str);
 int		check_mutex(pthread_mutex_t *check, t_philo *data);
 int		destroy_mutex_array(pthread_mutex_t *forks, int amount);
 int		create_rest_of_mutex(pthread_mutex_t *print,
-			pthread_mutex_t *dead, t_philo **data);
+			pthread_mutex_t *dead, pthread_mutex_t *meal, t_philo **data);
 void	raise_dead_flag(t_philo *data);
 
 void	my_usleep(t_philo *data, int time);

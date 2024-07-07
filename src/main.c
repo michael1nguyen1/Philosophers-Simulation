@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/07 00:30:09 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 14:59:52 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	*creeper_life(void *arg)
 	data = (t_philo *)arg;
 	count = 0;
 	i = 0;
-	while (data[0].meals_ate != data->max_meals)
+	while (data[0].meals_ate != data->max_meals && check_mutex(data->dead, data))
 		continue ;
 	while (1)
 	{
@@ -65,7 +65,6 @@ void	*creeper_life(void *arg)
 
 int	simulation(t_philo *data)
 {
-	pthread_t	thread[data[0].philo];
 	pthread_t	creeper;
 	int			i;
 	int			death;
@@ -81,7 +80,7 @@ int	simulation(t_philo *data)
 	while (i < data[0].philo)
 	{
 		data[i].alive = &death;
-		if (pthread_create(&thread[i], NULL, &philo_life, &data[i]) != 0)
+		if (pthread_create(&data[i].thread, NULL, &philo_life, &data[i]) != 0)
 			return (put_error_fd(2, "thread failed\n"));
 		i++;
 	}
@@ -93,8 +92,9 @@ int	simulation(t_philo *data)
 	}
 	while (i < data[0].philo)
 	{
-		if (pthread_join(thread[i++], NULL) != 0)
+		if (pthread_join(data[i].thread, NULL) != 0)
 			return (put_error_fd(2, "joined failed\n"));
+		i++;
 	}
 	return (0);
 }
@@ -127,6 +127,7 @@ int	main(int argc, char **argv)
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	dead;
 	pthread_mutex_t	print;
+	pthread_mutex_t	meal;
 
 	if (argc == 5 || argc == 6)
 	{
@@ -134,13 +135,13 @@ int	main(int argc, char **argv)
 			return (put_error_fd(2, "Invalid arguments!\n"));
 		if (init_struct(argc, argv, &data, &forks) == -1)
 			return (-1);
-		if (create_rest_of_mutex(&print, &dead, &data) == -1
+		if (create_rest_of_mutex(&print, &dead, &meal, &data) == -1
 			|| simulation(data) == -1)
 		{
-			clean_up(forks, data);
+			clean_up(forks, data, &dead, &print);
 			return (-1);
 		}
-		return (clean_up(forks, data));
+		return (clean_up(forks, data, &dead, &print));
 	}
 	else
 		return (put_error_fd(2, "Wrong number of ARGS!\n"));
