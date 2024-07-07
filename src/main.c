@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/07 18:10:35 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 18:36:56 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,11 @@ int	simulation(t_philo *data)
 		data[i].alive = &death;
 		pthread_mutex_unlock(data[i].dead);
 		if (pthread_create(&data[i].thread, NULL, &philo_life, &data[i]) != 0)
-			return (put_error_fd(2, "thread failed\n"));
+		{
+			raise_dead_flag(data);
+			put_error_fd(2, "thread failed\n");
+			break ;
+		}
 		i++;
 	}
 	i = 0;
