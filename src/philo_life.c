@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:46:25 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/07 18:59:16 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/07 19:23:59 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ void	eat(t_philo *data)
 	{
 		raise_dead_flag(data);
 		pthread_mutex_lock(data->print);
-		// usleep(5000);
 		printf("%d %d died3\n", current_time(data), data->philo_id);
 		pthread_mutex_unlock(data->print);
 		return ;
