@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 19:00:37 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/07 16:55:44 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/08 17:13:35 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,12 @@ int		ft_atoi(const char *str);
 int		check_args(int argc, char **argv);
 int		init_struct(int argc, char **argv, t_philo **data,
 			pthread_mutex_t **forks);
+void	convert_and_init(t_philo **data, char **argv, int argc);
 int		clean_up(pthread_mutex_t *forks, t_philo *data,
 			pthread_mutex_t *dead, pthread_mutex_t *print);
 int		check_overflow(char **argv);
+void	*creeper_life(void *arg);
+void	*philo_life(void *arg);
 
 int		put_error_fd(int fd, char *str);
 void	print_actions(t_philo *data, char *str);
@@ -61,6 +64,7 @@ int		check_mutex(pthread_mutex_t *check, t_philo *data);
 int		destroy_mutex_array(pthread_mutex_t *forks, int amount);
 int		create_rest_of_mutex(pthread_mutex_t *print,
 			pthread_mutex_t *dead, pthread_mutex_t *meal, t_philo **data);
+int		create_threads(t_philo *data, pthread_t *creeper, int *death);
 void	raise_dead_flag(t_philo *data);
 
 void	my_usleep(t_philo *data, int time);

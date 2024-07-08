@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:47:32 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/07 18:58:52 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/08 17:11:25 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,14 +55,11 @@ int	check_args(int argc, char **argv)
 	return (0);
 }
 
-int	init_struct(int argc, char **argv, t_philo **data, pthread_mutex_t **forks)
+void	convert_and_init(t_philo **data, char **argv, int argc)
 {
 	int	i;
 
 	i = 0;
-	*data = malloc(sizeof(t_philo) * ft_atoi(argv[1]));
-	if (!*data)
-		return (put_error_fd(2, "malloc failed in main\n"));
 	while (i < ft_atoi(argv[1]))
 	{	
 		(*data)[i].philo = ft_atoi(argv[1]);
@@ -79,12 +76,6 @@ int	init_struct(int argc, char **argv, t_philo **data, pthread_mutex_t **forks)
 		(*data)[i].last_ate = current_time(*data);
 		i++;
 	}
-	if (create_forks(*data, forks) == -1)
-	{
-		free(data);
-		return (-1);
-	}
-	return (0);
 }
 
 int	clean_up(pthread_mutex_t *forks, t_philo *data,
@@ -93,10 +84,10 @@ int	clean_up(pthread_mutex_t *forks, t_philo *data,
 	destroy_mutex_array(forks, data->philo);
 	if (forks)
 		free (forks);
+	pthread_mutex_destroy(data->meals);
 	if (data)
 		free (data);
 	pthread_mutex_destroy(dead);
 	pthread_mutex_destroy(print);
-	pthread_mutex_destroy(data->meals);
 	return (0);
 }

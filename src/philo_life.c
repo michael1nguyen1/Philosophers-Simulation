@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:46:25 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/07 19:23:59 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/08 17:16:18 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	eat(t_philo *data)
 	{
 		raise_dead_flag(data);
 		pthread_mutex_lock(data->print);
-		printf("%d %d died3\n", current_time(data), data->philo_id);
+		printf("%d %d died\n", current_time(data), data->philo_id);
 		pthread_mutex_unlock(data->print);
 		return ;
 	}
@@ -50,6 +50,9 @@ void	*lonely_philo(t_philo *data)
 	pick_up_forks(data);
 	my_usleep(data, data->die_time);
 	put_down_forks(data);
+	pthread_mutex_lock(data->print);
+	printf("%d %d died\n", current_time(data), data->philo_id);
+	pthread_mutex_unlock(data->print);
 	return (NULL);
 }
 

@@ -6,57 +6,24 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/07 19:22:47 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/08 17:11:33 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	*philo_life(void *arg)
+int	init_struct(int argc, char **argv, t_philo **data, pthread_mutex_t **forks)
 {
-	t_philo	*data;
-
-	data = (t_philo *)arg;
-	if (data->philo == 1)
-		return (lonely_philo(data));
-	if (data->philo_id % 2 == 0)
-		usleep(500);
-	print_actions(data, "is thinking");
-	while (check_mutex(data->dead, data))
+	*data = malloc(sizeof(t_philo) * ft_atoi(argv[1]));
+	if (!*data)
+		return (put_error_fd(2, "malloc failed in main\n"));
+	convert_and_init(data, argv, argc);
+	if (create_forks(*data, forks) == -1)
 	{
-		eat(data);
-		if (!check_mutex(data->dead, data))
-			break ;
-		go_to_sleep(data);
-		if (!check_mutex(data->dead, data))
-			break ;
-		thinking(data);
+		free(data);
+		return (-1);
 	}
-	// printf("philo %d exited life\n", data->philo_id);
-	return (NULL);
-}
-
-
-void	*creeper_life(void *arg)
-{
-	t_philo	*data;
-	int		i;
-
-	data = (t_philo *)arg;
-	i = 0;
-	while (1)
-	{
-		if (!check_meals(&data[i].meals_ate, &data[i])
-			&& check_mutex(data->dead, data))
-			i--;
-		if (i == data->philo - 1 || !check_mutex(data->dead, data))
-		{
-			raise_dead_flag(data);
-			break ;
-		}
-		i++;
-	}
-	return (NULL);
+	return (0);
 }
 
 int	simulation(t_philo *data)
@@ -67,26 +34,8 @@ int	simulation(t_philo *data)
 
 	death = 1;
 	i = 0;
-	if (data->max_meals > 0 && data->philo > 1)
-	{
-		data->alive = &death;
-		if (pthread_create(&creeper, NULL, &creeper_life, data) != 0)
-			return (put_error_fd(2, "thread failed\n"));
-	}
-	while (i < data[0].philo)
-	{
-		pthread_mutex_lock(data[i].dead);
-		data[i].alive = &death;
-		pthread_mutex_unlock(data[i].dead);
-		if (pthread_create(&data[i].thread, NULL, &philo_life, &data[i]) != 0)
-		{
-			raise_dead_flag(data);
-			put_error_fd(2, "thread failed\n");
-			break ;
-		}
-		i++;
-	}
-	i = 0;
+	if (create_threads(data, &creeper, &death) == -1)
+		return (-1);
 	if (data->max_meals > 0 && data->philo > 1)
 	{
 		if (pthread_join(creeper, NULL) != 0)
