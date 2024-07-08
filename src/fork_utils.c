@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 15:08:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/08 17:15:59 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/08 18:08:55 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@ void	pick_up_forks(t_philo *data)
 	pthread_mutex_lock(data->left_fork);
 	if (!check_mutex(data->dead, data))
 		return ;
-	print_actions(data, "has taken left fork");
+	print_actions(data, "has taken a fork");
 	if (check_mutex(data->dead, data) && data->philo != 1)
 	{
 		pthread_mutex_lock(data->right_fork);
 		if (!check_mutex(data->dead, data))
 			return ;
-		print_actions(data, "has taken right fork");
+		print_actions(data, "has taken a fork");
 		print_actions(data, "is eating");
 		data->last_ate = current_time(data);
 	}
@@ -76,4 +76,16 @@ void	assign_forks(t_philo *data, pthread_mutex_t *forks)
 			data[i].right_fork = &forks[i + 1];
 		i++;
 	}
+}
+
+int	join_after_create_fail(t_philo *data, int i)
+{
+	raise_dead_flag(data);
+	while (i > -1)
+	{
+		if (pthread_join(data[i].thread, NULL) != 0)
+			return (put_error_fd(2, "joined failed\n"));
+		i--;
+	}
+	return (0);
 }

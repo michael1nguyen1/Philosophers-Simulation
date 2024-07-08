@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/08 17:11:33 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/08 18:08:46 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,33 @@ int	init_struct(int argc, char **argv, t_philo **data, pthread_mutex_t **forks)
 	{
 		free(data);
 		return (-1);
+	}
+	return (0);
+}
+
+int	create_threads(t_philo *data, pthread_t *creeper, int *death)
+{
+	int	i;
+
+	i = 0;
+	if (data->max_meals > 0 && data->philo > 1)
+	{
+		data->alive = death;
+		if (pthread_create(creeper, NULL, &creeper_life, data) != 0)
+			return (put_error_fd(2, "thread failed\n"));
+	}
+	while (i < data[0].philo)
+	{
+		pthread_mutex_lock(data[i].dead);
+		data[i].alive = death;
+		pthread_mutex_unlock(data[i].dead);
+		if (pthread_create(&data[i].thread, NULL, &philo_life, &data[i]) != 0)
+		{
+			if (join_after_create_fail(data, i - 1) == -1)
+				return (-1);
+			return (put_error_fd(2, "thread failed\n"));
+		}
+		i++;
 	}
 	return (0);
 }

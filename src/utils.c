@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:47:32 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/08 17:11:25 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/08 18:07:45 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,9 @@ int	check_args(int argc, char **argv)
 	int	j;
 
 	i = 1;
-	if ((argv[5] && ft_atoi(argv[5]) == 0) || check_overflow(argv) == -1)
+	if ((argv[5] && ft_atoi(argv[5]) == 0) || check_overflow(argv) == -1
+		|| ft_atoi(argv[1]) == 0 || ft_atoi(argv[2]) == 0
+		|| ft_atoi(argv[3]) == 0 || ft_atoi(argv[4]) == 0)
 		return (-1);
 	while (i < argc)
 	{
