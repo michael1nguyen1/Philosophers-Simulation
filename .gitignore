@@ -4,3 +4,4 @@ philo
 oldway.c
 .vscode
 *.o
+result
