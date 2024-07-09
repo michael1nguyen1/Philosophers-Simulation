@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 19:00:37 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/08 18:10:26 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/08 21:53:08 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int		get_time(void);
 
 int		create_forks(t_philo *data, pthread_mutex_t **forks);
 void	assign_forks(t_philo *data, pthread_mutex_t *forks);
-void	pick_up_forks(t_philo *data);
+int		pick_up_forks(t_philo *data);
 void	put_down_forks(t_philo *data);
 
 void	thinking(t_philo *data);

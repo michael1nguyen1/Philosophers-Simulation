@@ -6,27 +6,50 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 15:08:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/08 18:08:55 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/09 14:46:37 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	pick_up_forks(t_philo *data)
+int	pick_up_right_fork(t_philo *data)
 {
 	pthread_mutex_lock(data->left_fork);
 	if (!check_mutex(data->dead, data))
-		return ;
+	{
+		pthread_mutex_unlock(data->left_fork);
+		return (-1);
+	}
 	print_actions(data, "has taken a fork");
+	return (0);
+}
+
+int	pick_up_forks(t_philo *data)
+{
+	if (pick_up_right_fork(data) == -1)
+		return (-1);
 	if (check_mutex(data->dead, data) && data->philo != 1)
 	{
 		pthread_mutex_lock(data->right_fork);
 		if (!check_mutex(data->dead, data))
-			return ;
+		{
+			pthread_mutex_unlock(data->left_fork);
+			pthread_mutex_unlock(data->right_fork);
+			return (-1);
+		}
+	}
+	else if (!check_mutex(data->dead, data) && data->philo != 1)
+	{
+		pthread_mutex_unlock(data->left_fork);
+		return (-1);
+	}
+	if (data->philo != 1)
+	{
 		print_actions(data, "has taken a fork");
 		print_actions(data, "is eating");
 		data->last_ate = current_time(data);
 	}
+	return (0);
 }
 
 void	put_down_forks(t_philo *data)
@@ -34,30 +57,6 @@ void	put_down_forks(t_philo *data)
 	pthread_mutex_unlock(data->left_fork);
 	if (data->philo != 1)
 		pthread_mutex_unlock(data->right_fork);
-}
-
-void	my_usleep(t_philo *data, int time)
-{
-	int	start;
-
-	start = current_time(data);
-	if (!check_mutex(data->dead, data))
-		return ;
-	while (current_time(data) - start < time)
-	{
-		if (!check_mutex(data->dead, data))
-			return ;
-		else if (current_time(data) - data->last_ate > data->die_time
-			&& check_mutex(data->dead, data))
-		{
-			raise_dead_flag(data);
-			pthread_mutex_lock(data->print);
-			printf("%d %d died\n", current_time(data), data->philo_id);
-			pthread_mutex_unlock(data->print);
-			return ;
-		}
-		usleep(500);
-	}
 }
 
 void	assign_forks(t_philo *data, pthread_mutex_t *forks)
