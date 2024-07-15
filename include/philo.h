@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 19:00:37 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/11 17:11:46 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/15 13:16:25 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ typedef struct s_philo
 	int				sleep_time;
 	int				max_meals;
 	int				philo_id;
-	int				*alive;
+	int				stop;
 	int				start_time;
 	int				meals_ate;
 	int				last_ate;
@@ -60,11 +60,11 @@ void	*philo_life(void *arg);
 int		put_error_fd(int fd, char *str);
 void	print_actions(t_philo *data, char *str);
 
-int		check_mutex(pthread_mutex_t *check, t_philo *data);
+int		check_stop(pthread_mutex_t *check, t_philo *data);
 int		destroy_mutex_array(pthread_mutex_t *forks, int amount);
 int		create_rest_of_mutex(pthread_mutex_t *print,
 			pthread_mutex_t *dead, pthread_mutex_t *meal, t_philo **data);
-int		create_threads(t_philo *data, pthread_t *creeper, int *death);
+int		create_threads(t_philo *data, pthread_t *creeper);
 void	raise_dead_flag(t_philo *data);
 
 void	my_usleep(t_philo *data, int time);

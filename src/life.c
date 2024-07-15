@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:51:20 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/08 17:10:11 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/15 14:53:57 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,13 @@ void	*philo_life(void *arg)
 	if (data->philo_id % 2 == 0)
 		usleep(500);
 	print_actions(data, "is thinking");
-	while (check_mutex(data->dead, data))
+	while (!check_stop(data->dead, data))
 	{
 		eat(data);
-		if (!check_mutex(data->dead, data))
+		if (check_stop(data->dead, data))
 			break ;
 		go_to_sleep(data);
-		if (!check_mutex(data->dead, data))
+		if (check_stop(data->dead, data))
 			break ;
 		thinking(data);
 	}
@@ -45,11 +45,11 @@ void	*creeper_life(void *arg)
 	while (1)
 	{
 		if (!check_meals(&data[i].meals_ate, &data[i])
-			&& check_mutex(data->dead, data))
+			&& check_stop(data->dead, &data[i]))
 			i--;
-		if (i == data->philo - 1 || !check_mutex(data->dead, data))
+		if (i == data->philo - 1 || !check_stop(data->dead, &data[i]))
 		{
-			raise_dead_flag(data);
+			raise_dead_flag(&data[i]);
 			break ;
 		}
 		i++;

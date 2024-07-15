@@ -6,16 +6,16 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 15:08:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/09 14:46:37 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/15 15:27:57 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	pick_up_right_fork(t_philo *data)
+int	pick_up_left_fork(t_philo *data)
 {
 	pthread_mutex_lock(data->left_fork);
-	if (!check_mutex(data->dead, data))
+	if (check_stop(data->dead, data))
 	{
 		pthread_mutex_unlock(data->left_fork);
 		return (-1);
@@ -25,21 +25,24 @@ int	pick_up_right_fork(t_philo *data)
 }
 
 int	pick_up_forks(t_philo *data)
-{
-	if (pick_up_right_fork(data) == -1)
-		return (-1);
-	if (check_mutex(data->dead, data) && data->philo != 1)
+{	
+	if (pick_up_left_fork(data) == -1){
+	// printf("philo_id: %d in pick_up_forks\n", data->philo_id);
+		return (-1);}
+	if (!check_stop(data->dead, data) && data->philo != 1)
 	{
+		// printf("philo_id: %d in pick_up_forks2\n", data->philo_id);
 		pthread_mutex_lock(data->right_fork);
-		if (!check_mutex(data->dead, data))
+		if (check_stop(data->dead, data))
 		{
 			pthread_mutex_unlock(data->left_fork);
 			pthread_mutex_unlock(data->right_fork);
 			return (-1);
 		}
 	}
-	else if (!check_mutex(data->dead, data) && data->philo != 1)
+	else if (check_stop(data->dead, data) && data->philo != 1)
 	{
+		// printf("philo_id: %d in pick_up_forks3\n", data->philo_id);
 		pthread_mutex_unlock(data->left_fork);
 		return (-1);
 	}
@@ -79,7 +82,6 @@ void	assign_forks(t_philo *data, pthread_mutex_t *forks)
 
 int	join_after_create_fail(t_philo *data, int i)
 {
-	raise_dead_flag(data);
 	while (i > -1)
 	{
 		if (pthread_join(data[i].thread, NULL) != 0)

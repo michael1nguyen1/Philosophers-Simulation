@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:47:32 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/08 18:07:45 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/15 15:24:26 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	put_error_fd(int fd, char *str)
 void	print_actions(t_philo *data, char *str)
 {
 	pthread_mutex_lock(data->print);
-	if (check_mutex(data->dead, data))
+	if (!check_stop(data->dead, data))
 		printf("%d %d %s\n", current_time(data), data->philo_id, str);
 	pthread_mutex_unlock(data->print);
 }
@@ -74,6 +74,7 @@ void	convert_and_init(t_philo **data, char **argv, int argc)
 			(*data)[i].max_meals = -1;
 		(*data)[i].philo_id = i + 1;
 		(*data)[i].meals_ate = 0;
+		(*data)[i].stop = 0;
 		(*data)[i].start_time = get_time();
 		(*data)[i].last_ate = current_time(*data);
 		i++;

@@ -6,20 +6,22 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 13:27:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/08 18:08:09 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/15 13:12:48 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	check_mutex(pthread_mutex_t *check, t_philo *data)
+int	check_stop(pthread_mutex_t *check, t_philo *data)
 {
-	int	ret;
-
 	pthread_mutex_lock(check);
-	ret = *data->alive;
+	if (data->stop == 1)
+	{
+		pthread_mutex_unlock(check);
+		return (1);
+	}
 	pthread_mutex_unlock(check);
-	return (ret);
+	return (0);
 }
 
 int	destroy_mutex_array(pthread_mutex_t *forks, int amount)
