@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:46:25 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/11 16:39:08 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/11 17:13:29 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	eat(t_philo *data)
 	return ;
 }
 
-void				*lonely_philo(t_philo *data)
+void	*lonely_philo(t_philo *data)
 {
 	pick_up_forks(data);
 	my_usleep(data, data->die_time);
