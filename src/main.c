@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/18 13:13:44 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/15 13:22:14 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/15 20:52:31 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	create_threads(t_philo *data, pthread_t *creeper)
 	int	i;
 
 	i = 0;
-	if (data->max_meals > 0 && data->philo > 1)
+	if (data->philo > 1)
 	{
 		if (pthread_create(creeper, NULL, &creeper_life, data) != 0)
 			return (put_error_fd(2, "thread failed\n"));
@@ -57,7 +57,7 @@ int	simulation(t_philo *data)
 	i = 0;
 	if (create_threads(data, &creeper) == -1)
 		return (-1);
-	if (data->max_meals > 0 && data->philo > 1)
+	if (data->philo > 1)
 	{
 		if (pthread_join(creeper, NULL) != 0)
 			return (put_error_fd(2, "joined failed\n"));
@@ -97,7 +97,6 @@ int	main(int argc, char **argv)
 {
 	t_philo			*data;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	dead;
 	pthread_mutex_t	print;
 	pthread_mutex_t	meal;
 
@@ -107,13 +106,13 @@ int	main(int argc, char **argv)
 			return (put_error_fd(2, "Invalid arguments!\n"));
 		if (init_struct(argc, argv, &data, &forks) == -1)
 			return (-1);
-		if (create_rest_of_mutex(&print, &dead, &meal, &data) == -1
+		if (create_rest_of_mutex(&print, &meal, &data) == -1
 			|| simulation(data) == -1)
 		{
-			clean_up(forks, data, &dead, &print);
+			clean_up(forks, data, &print);
 			return (-1);
 		}
-		return (clean_up(forks, data, &dead, &print));
+		return (clean_up(forks, data, &print));
 	}
 	else
 		return (put_error_fd(2, "Wrong number of ARGS!\n"));

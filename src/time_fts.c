@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:58:03 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/15 15:27:14 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/15 20:26:24 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,11 @@ void	my_usleep(t_philo *data, int time)
 	int	start;
 
 	start = current_time(data);
-	if (check_stop(data->dead, data))
+	if (check_stop(data))
 		return ;
 	while (current_time(data) - start < time)
 	{
-		if (check_stop(data->dead, data))
+		if (check_stop(data))
 			return ;
 		else if (current_time(data) - data->last_ate > data->die_time)
 		{

@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 15:08:59 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/15 15:27:57 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/15 20:27:44 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int	pick_up_left_fork(t_philo *data)
 {
 	pthread_mutex_lock(data->left_fork);
-	if (check_stop(data->dead, data))
+	if (check_stop(data))
 	{
 		pthread_mutex_unlock(data->left_fork);
 		return (-1);
@@ -29,18 +29,18 @@ int	pick_up_forks(t_philo *data)
 	if (pick_up_left_fork(data) == -1){
 	// printf("philo_id: %d in pick_up_forks\n", data->philo_id);
 		return (-1);}
-	if (!check_stop(data->dead, data) && data->philo != 1)
+	if (!check_stop(data) && data->philo != 1)
 	{
 		// printf("philo_id: %d in pick_up_forks2\n", data->philo_id);
 		pthread_mutex_lock(data->right_fork);
-		if (check_stop(data->dead, data))
+		if (check_stop(data))
 		{
 			pthread_mutex_unlock(data->left_fork);
 			pthread_mutex_unlock(data->right_fork);
 			return (-1);
 		}
 	}
-	else if (check_stop(data->dead, data) && data->philo != 1)
+	else if (check_stop(data) && data->philo != 1)
 	{
 		// printf("philo_id: %d in pick_up_forks3\n", data->philo_id);
 		pthread_mutex_unlock(data->left_fork);

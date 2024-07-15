@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:46:25 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/15 15:27:30 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/15 20:28:11 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,16 @@ void	go_to_sleep(t_philo *data)
 
 void	eat(t_philo *data)
 {
-	// printf("philo_id: %d in eat\n", data->philo_id);
-	if (current_time(data) - data->last_ate > data->die_time)
-	{
-		// printf("philo_id: %d in eat2\n", data->philo_id);
-		pthread_mutex_lock(data->print);
-		printf("%d %d died1\n", current_time(data), data->philo_id);
-		pthread_mutex_unlock(data->print);
-		return ;
-	}
-	else if (!check_stop(data->dead, data))
+	// // printf("philo_id: %d in eat\n", data->philo_id);
+	// if (current_time(data) - data->last_ate > data->die_time)
+	// {
+	// 	// printf("philo_id: %d in eat2\n", data->philo_id);
+	// 	pthread_mutex_lock(data->print);
+	// 	printf("%d %d died1\n", current_time(data), data->philo_id);
+	// 	pthread_mutex_unlock(data->print);
+	// 	return ;
+	// }
+	if (!check_stop(data))
 	{
 		// printf("philo_id:%d in eat 3\n", data->philo_id);
 		if (pick_up_forks(data) == -1)
@@ -60,7 +60,7 @@ void	*lonely_philo(t_philo *data)
 
 void	raise_dead_flag(t_philo *data)
 {
-	pthread_mutex_lock(data->dead);
+	pthread_mutex_lock(&data->dead);
 	data->stop = 1;
-	pthread_mutex_unlock(data->dead);
+	pthread_mutex_unlock(&data->dead);
 }

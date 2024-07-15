@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:47:32 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/15 15:24:26 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/15 20:50:20 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	put_error_fd(int fd, char *str)
 void	print_actions(t_philo *data, char *str)
 {
 	pthread_mutex_lock(data->print);
-	if (!check_stop(data->dead, data))
+	if (!check_stop(data))
 		printf("%d %d %s\n", current_time(data), data->philo_id, str);
 	pthread_mutex_unlock(data->print);
 }
@@ -73,7 +73,6 @@ void	convert_and_init(t_philo **data, char **argv, int argc)
 		else
 			(*data)[i].max_meals = -1;
 		(*data)[i].philo_id = i + 1;
-		(*data)[i].meals_ate = 0;
 		(*data)[i].stop = 0;
 		(*data)[i].start_time = get_time();
 		(*data)[i].last_ate = current_time(*data);
@@ -81,16 +80,22 @@ void	convert_and_init(t_philo **data, char **argv, int argc)
 	}
 }
 
-int	clean_up(pthread_mutex_t *forks, t_philo *data,
-	pthread_mutex_t *dead, pthread_mutex_t *print)
+int	clean_up(pthread_mutex_t *forks, t_philo *data, pthread_mutex_t *print)
 {
+	int	i;
+
+	i = 0;
 	destroy_mutex_array(forks, data->philo);
 	if (forks)
 		free (forks);
 	pthread_mutex_destroy(data->meals);
+	pthread_mutex_destroy(print);
+	while (i < data->philo)
+	{
+		pthread_mutex_destroy(&data[i].dead);
+		i++;	
+	}
 	if (data)
 		free (data);
-	pthread_mutex_destroy(dead);
-	pthread_mutex_destroy(print);
 	return (0);
 }
