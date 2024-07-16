@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:47:32 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/15 20:50:20 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/16 13:57:27 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ int	clean_up(pthread_mutex_t *forks, t_philo *data, pthread_mutex_t *print)
 	while (i < data->philo)
 	{
 		pthread_mutex_destroy(&data[i].dead);
-		i++;	
+		i++;
 	}
 	if (data)
 		free (data);

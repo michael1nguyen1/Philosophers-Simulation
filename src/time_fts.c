@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:58:03 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/15 20:26:24 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/16 13:13:06 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	my_usleep(t_philo *data, int time)
 		else if (current_time(data) - data->last_ate > data->die_time)
 		{
 			pthread_mutex_lock(data->print);
-			printf("%d %d died3\n", current_time(data), data->philo_id);
+			printf("%d %d died\n", current_time(data), data->philo_id);
 			pthread_mutex_unlock(data->print);
 			return ;
 		}

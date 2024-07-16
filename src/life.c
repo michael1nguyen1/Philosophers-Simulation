@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:51:20 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/15 20:30:02 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/16 13:57:45 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	*philo_life(void *arg)
 void	end_everyone(t_philo *data)
 {
 	int		j;
-	
+
 	j = 0;
 	while (j < data->philo)
 	{
@@ -70,8 +70,7 @@ void	*creeper_life(void *arg)
 			if (count == data->philo)
 				end_everyone(data);
 		}
-		i++;
-		if (i == data->philo)
+		if (++i == data->philo)
 			i = 0;
 	}
 	return (NULL);

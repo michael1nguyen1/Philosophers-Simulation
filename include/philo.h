@@ -6,7 +6,7 @@
 /*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 19:00:37 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/15 20:24:42 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/07/16 13:57:11 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int		check_args(int argc, char **argv);
 int		init_struct(int argc, char **argv, t_philo **data,
 			pthread_mutex_t **forks);
 void	convert_and_init(t_philo **data, char **argv, int argc);
-int		clean_up(pthread_mutex_t *forks, t_philo *data, 
+int		clean_up(pthread_mutex_t *forks, t_philo *data,
 			pthread_mutex_t *print);
 int		join_after_create_fail(t_philo *data, int i);
 int		check_overflow(char **argv);
