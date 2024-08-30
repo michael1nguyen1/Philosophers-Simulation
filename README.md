@@ -22,4 +22,5 @@ The 5th argument (optional) sets the number of meals each philosopher must eat b
 
 ```./philo 10 200 150 150``` Someone will die with this simulation since there is not enough time to rotate the forks.
 
-![Screenshot from 2024-08-30 15-35-19](https://github.com/user-attachments/assets/e33b6fe9-27f5-4e58-92a1-9f9a29e4c196)
+![Screenshot from 2024-08-30 15-40-48](https://github.com/user-attachments/assets/a52b969d-f680-421c-beda-c9ddf1d94a16)
+
