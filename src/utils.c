@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: linhnguy <linhnguy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: linhnguy <linhnguy@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 21:47:32 by linhnguy          #+#    #+#             */
-/*   Updated: 2024/07/16 13:57:27 by linhnguy         ###   ########.fr       */
+/*   Updated: 2024/08/30 15:39:56 by linhnguy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	print_actions(t_philo *data, char *str)
 {
 	pthread_mutex_lock(data->print);
 	if (!check_stop(data))
-		printf("%d %d %s\n", current_time(data), data->philo_id, str);
+		printf("%d philosopher %d %s\n", current_time(data), data->philo_id, str);
 	pthread_mutex_unlock(data->print);
 }
 
